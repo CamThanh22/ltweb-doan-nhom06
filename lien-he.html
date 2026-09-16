@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Biểu mẫu liên hệ, đặt lịch gửi mẫu kiểm định ngọc quý và gửi phản hồi cho ban quản trị JadeHub.">
+    <title>Liên hệ & Gửi mẫu thẩm định | JadeHub</title>
+</head>
+
+<body>
+    <header>
+        <p><strong>JadeHub</strong> — Minh bạch nguồn gốc & Thẩm định ngọc quý</p>
+        <nav>
+            <ul>
+                <li><a href="index.html">Trang chủ</a></li>
+                <li><a href="danh-sach.html">Danh mục ngọc</a></li>
+                <li><a href="chi-tiet.html">Viên ngọc tiêu biểu</a></li>
+                <li><a href="gioi-thieu.html">Giới thiệu</a></li>
+                <li><a href="lien-he.html">Liên hệ & Thẩm định</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Gửi yêu cầu giám định và liên hệ</h1>
+
+        <section>
+            <h2>Biểu mẫu đăng ký thẩm định ngọc</h2>
+            <p>Vui lòng điền đầy đủ các thông số bên dưới. Các trường có dấu (*) là thông tin bắt buộc.</p>
+
+            <form action="#" method="post">
+                <!-- Nhóm thông tin cá nhân -->
+                <fieldset>
+                    <legend>1. Thông tin người gửi</legend>
+
+                    <p>
+                        <label for="txt-hoten">Họ và tên (*):</label><br>
+                        <input type="text" id="txt-hoten" name="hoten" required minlength="4" maxlength="50"
+                            placeholder="Ví dụ: Trần Thị Cẩm Thanh">
+                    </p>
+
+                    <p>
+                        <label for="txt-email">Địa chỉ Email (*):</label><br>
+                        <input type="email" id="txt-email" name="email" required placeholder="name@domain.com">
+                    </p>
+
+                    <p>
+                        <label for="txt-sdt">Số điện thoại (*):</label><br>
+                        <input type="tel" id="txt-sdt" name="sdt" required pattern="0[0-9]{9}"
+                            placeholder="Ví dụ: 0912345678 (10 chữ số)">
+                    </p>
+                </fieldset>
+
+                <!-- Nhóm thông tin ngọc kiểm định -->
+                <fieldset>
+                    <legend>2. Chi tiết hiện vật cần thẩm định</legend>
+
+                    <p>
+                        <label for="opt-loaingoc">Loại ngọc quý:</label><br>
+                        <select id="opt-loaingoc" name="loaingoc">
+                            <option value="phithuy">Ngọc phỉ thúy (Jadeite)</option>
+                            <option value="camthach">Ngọc cẩm thạch</option>
+                            <option value="hoadien">Ngọc bích Hòa Điền (Nephrite)</option>
+                            <option value="khac">Loại đá quý khác</option>
+                        </select>
+                    </p>
+
+                    <p>
+                        <label for="num-soluong">Số lượng mẫu gửi (1 - 20 viên) (*):</label><br>
+                        <input type="number" id="num-soluong" name="soluong" required min="1" max="20" value="1">
+                    </p>
+
+                    <p>
+                        <label for="date-hen">Ngày dự kiến mang mẫu đến phòng lab (*):</label><br>
+                        <input type="date" id="date-hen" name="ngayhen" required min="2026-09-17">
+                    </p>
+
+                    <p>
+                        <label for="file-anh">Tải lên ảnh chụp mẫu ngọc thô hoặc giấy tờ kèm theo:</label><br>
+                        <input type="file" id="file-anh" name="anhngoc" accept="image/png, image/jpeg">
+                    </p>
+
+                    <p>
+                        <label for="txt-ghichu">Mô tả đặc điểm mẫu hoặc yêu cầu riêng:</label><br>
+                        <textarea id="txt-ghichu" name="ghichu" rows="4" cols="50"
+                            placeholder="Ví dụ: Cần kiểm tra xem có tẩm polymer hay nhuộm màu không..."></textarea>
+                    </p>
+                </fieldset>
+
+                <!-- Xác nhận điều khoản -->
+                <fieldset>
+                    <legend>3. Xác nhận</legend>
+                    <p>
+                        <input type="checkbox" id="chk-camket" name="camket" required>
+                        <label for="chk-camket">Tôi cam kết hiện vật gửi thẩm định là sở hữu hợp pháp (*)</label>
+                    </p>
+                </fieldset>
+
+                <p>
+                    <button type="submit">Gửi thông tin thẩm định</button>
+                    <button type="reset">Nhập lại từ đầu</button>
+                </p>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Nhóm 06 — Học phần Thiết kế và Lập trình Web — Khoa Toán – Tin, Trường ĐH Sư phạm – ĐHĐN.</p>
+    </footer>
+</body>
+
+</html>
