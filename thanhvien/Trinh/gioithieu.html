@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang cá nhân - Huỳnh Trần Phương Trinh</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; color: #333; }
+        header, footer { background-color: #f4f4f4; padding: 15px; text-align: center; }
+        nav { margin-bottom: 20px; }
+        main { display: flex; flex-direction: column; gap: 20px; margin: 20px 0; }
+        section, article { border: 1px solid #ddd; padding: 15px; border-radius: 5px; }
+        img { max-width: 150px; height: auto; border-radius: 50%; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        th { background-color: #eee; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Trang Giới Thiệu Cá Nhân</h1>
+        <nav>
+            <!-- Liên kết hai chiều: Quay về trang chủ của nhóm -->
+            <a href="../../gioi-thieu.html">← Quay về Trang chủ Nhóm</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Section: Giới thiệu bản thân -->
+        <section id="gioi-thieu">
+            <h2>Giới thiệu bản thân</h2>
+            <img src="avatar.jpg" alt="Ảnh chân dung của Huỳnh Trần Phương Trinh" width="150" height="150">
+            <p>Họ và tên: <strong>Huỳnh Trần Phương Trinh</strong></p>
+            <p>Sinh viên ngành: CNTT / Sư phạm Tin học</p>
+
+            <h3>Kỹ năng cá nhân</h3>
+            <ul>
+                <li>Lập trình Web (HTML5, CSS3, PHP, JavaScript)</li>
+                <li>Quản lý mã nguồn với Git & GitHub</li>
+                <li>Quản trị hệ thống Linux cơ bản</li>
+            </ul>
+        </section>
+
+        <!-- Article: Dự án / Sở thích -->
+        <article id="du-an-so-thich">
+            <h2>Dự án & Sở thích</h2>
+            <p><strong>Dự án:</strong> Phát triển game xếp hình bằng Python Tkinter và xây dựng bài giảng điện tử số.</p>
+            <p><strong>Sở thích:</strong> nghe nhạc.</p>
+        </article>
+
+        <!-- Section: Thời khóa biểu tuần -->
+        <section id="thoi-khoa-bieu">
+            <h2>Thời khóa biểu tuần</h2>
+            <table>
+                <caption>Thời khóa biểu các học phần trong tuần</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Ca / Thứ</th>
+                        <th scope="col">Thứ 2</th>
+                        <th scope="col">Thứ 3</th>
+                        <th scope="col">Thứ 4</th>
+                        <th scope="col">Thứ 5</th>
+                        <th scope="col">Thứ 6</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">Sáng</th>
+                        <td>tự học</td>
+                        <td>Phân tích thiết kế hệ thống</td>
+                        <td>Phương pháp dạy học bộ môn tin học</td>
+                        <td>Lịch sử Đảng</td>
+                        <td>HQT CSDL</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Chiều</th>
+                        <td>Tự học</td>
+                        <td>Tự học</td>
+                        <td>Tự học</td>
+                        <td>Cơ sở dữ liệu</td>
+                        <td>Đi dạy thêm</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Huỳnh Trần Phương Trinh - Thực hành Lập trình Web</p>
+    </footer>
+
+</body>
+</html>
