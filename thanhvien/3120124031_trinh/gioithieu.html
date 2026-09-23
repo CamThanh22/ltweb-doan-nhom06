@@ -5,62 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trang cá nhân - Huỳnh Trần Phương Trinh</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 20px;
-            color: #333;
-        }
-
-        header,
-        footer {
-            background-color: #f4f4f4;
-            padding: 15px;
-            text-align: center;
-        }
-
-        nav {
-            margin-bottom: 20px;
-        }
-
-        main {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin: 20px 0;
-        }
-
-        section,
-        article {
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 5px;
-        }
-
-        img {
-            max-width: 150px;
-            height: auto;
-            border-radius: 50%;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        th,
-        td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: center;
-        }
-
-        th {
-            background-color: #eee;
-        }
-    </style>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="css/style-trinh.css">
 </head>
 
 <body>
@@ -103,37 +49,39 @@
         <!-- Section: Thời khóa biểu tuần -->
         <section id="thoi-khoa-bieu">
             <h2>Thời khóa biểu tuần</h2>
-            <table>
-                <caption>Thời khóa biểu các học phần trong tuần</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">Ca / Thứ</th>
-                        <th scope="col">Thứ 2</th>
-                        <th scope="col">Thứ 3</th>
-                        <th scope="col">Thứ 4</th>
-                        <th scope="col">Thứ 5</th>
-                        <th scope="col">Thứ 6</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">Sáng</th>
-                        <td>tự học</td>
-                        <td>Phân tích thiết kế hệ thống</td>
-                        <td>Phương pháp dạy học bộ môn tin học</td>
-                        <td>Lịch sử Đảng</td>
-                        <td>HQT CSDL</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Chiều</th>
-                        <td>Tự học</td>
-                        <td>Tự học</td>
-                        <td>Tự học</td>
-                        <td>Cơ sở dữ liệu</td>
-                        <td>Đi dạy thêm</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="khung-thoi-khoa-bieu">
+                <table>
+                    <caption>Thời khóa biểu các học phần trong tuần</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Ca / Thứ</th>
+                            <th scope="col">Thứ 2</th>
+                            <th scope="col">Thứ 3</th>
+                            <th scope="col">Thứ 4</th>
+                            <th scope="col">Thứ 5</th>
+                            <th scope="col">Thứ 6</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Sáng</th>
+                            <td>tự học</td>
+                            <td>Phân tích thiết kế hệ thống</td>
+                            <td>Phương pháp dạy học bộ môn tin học</td>
+                            <td>Lịch sử Đảng</td>
+                            <td>HQT CSDL</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Chiều</th>
+                            <td>Tự học</td>
+                            <td>Tự học</td>
+                            <td>Tự học</td>
+                            <td>Cơ sở dữ liệu</td>
+                            <td>Đi dạy thêm</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </section>
     </main>
 
