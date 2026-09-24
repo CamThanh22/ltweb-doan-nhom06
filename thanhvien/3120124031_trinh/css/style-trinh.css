@@ -1,0 +1,78 @@
+/* =========================================
+   TRANG CÁ NHÂN - HUỲNH TRẦN PHƯƠNG TRINH
+   ======================================== */
+
+/* Bố cục nội dung */
+main {
+    width: min(100% - 32px, 1000px);
+    margin: 0 auto;
+}
+
+main section,
+main article {
+    margin-bottom: 24px;
+}
+
+/* Ảnh chân dung */
+section img {
+    width: 150px;
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--bo-goc);
+}
+
+/* Danh sách kỹ năng */
+section ul {
+    padding-left: 24px;
+}
+
+section li {
+    margin-bottom: 8px;
+}
+
+/* Khung bảng responsive */
+.khung-thoi-khoa-bieu {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* Bảng thời khóa biểu */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+}
+
+th,
+td {
+    padding: 10px;
+    border: 1px solid #cccccc;
+    text-align: left;
+}
+
+/* Trạng thái liên kết */
+a:hover {
+    text-decoration: underline;
+}
+
+a:active {
+    opacity: 0.8;
+}
+
+a:focus-visible {
+    outline: 3px solid var(--mau-nhan);
+    outline-offset: 3px;
+}
+
+/* Tablet và desktop */
+@media (min-width: 768px) {
+    main {
+        padding: 24px;
+    }
+
+    section ul {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+}

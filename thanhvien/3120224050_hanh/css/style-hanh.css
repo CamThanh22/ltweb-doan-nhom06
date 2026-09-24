@@ -1,0 +1,80 @@
+/* ========================================
+   TRANG CÁ NHÂN - NGUYỄN THỊ BÍCH HẠNH
+   ======================================== */
+/* Bố cục nội dung */
+main {
+    width: min(100% - 32px, 1000px);
+    margin: 0 auto;
+}
+
+main section,
+main article {
+    margin-bottom: 24px;
+}
+
+/* Ảnh chân dung */
+figure {
+    margin: 20px 0;
+}
+
+figure img {
+    width: 200px;
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--bo-goc);
+}
+
+/* Danh sách kỹ năng */
+article ul {
+    padding-left: 24px;
+}
+
+article li {
+    margin-bottom: 8px;
+}
+
+/* Bảng thời khóa biểu */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 10px;
+    border: 1px solid #cccccc;
+    text-align: left;
+}
+
+/* Liên kết */
+a:hover {
+    text-decoration: underline;
+}
+
+a:active {
+    opacity: 0.8;
+}
+
+a:focus-visible {
+    outline: 3px solid var(--mau-nhan);
+    outline-offset: 3px;
+}
+
+/* Khung bảng responsive */
+.khung-thoi-khoa-bieu {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* Từ máy tính bảng trở lên */
+@media (min-width: 768px) {
+    main {
+        padding: 24px;
+    }
+
+    article ul {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+}
