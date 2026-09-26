@@ -649,3 +649,23 @@ th {
         padding: 24px;
     }
 }
+
+/* Bài tập 4: menu và điều khiển tương tác */
+.nut-menu { display: none; color: var(--mau-trang); background: var(--mau-chinh-dam); border: 1px solid var(--mau-trang); padding: 10px 16px; border-radius: var(--bo-goc); cursor: pointer; }
+.so-yeu-thich { color: var(--mau-trang); margin: 8px 0 0; }
+.bo-loc-san-pham { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 16px 0; }
+.bo-loc-san-pham input, .bo-loc-san-pham select { max-width: 100%; padding: 8px; }
+.noi-dung-the button, #chi-tiet-dong button, #trang-thai-danh-sach button, #trang-thai-chi-tiet button { margin: 8px; padding: 8px 12px; cursor: pointer; }
+.loi-truong { display: block; color: #9b1c1c; font-size: .9rem; }
+.loi-truong:empty { display: none; }
+#chi-tiet-dong img { max-width: 100%; height: auto; }
+@media (max-width: 767px) {
+    .js .nut-menu { display: inline-block; }
+    .js .menu { display: none; }
+    .js .menu.mo { display: block; }
+}
+.ca-nhan-toi { background: #182824; color: #f7f8f7; }
+.ca-nhan-toi main { background: #182824; color: #f7f8f7; }
+.ca-nhan-toi a { color: #b4ead6; }
+[hidden] { display: none !important; }
+@media print { .nut-menu, main button, main input { display: none !important; } }

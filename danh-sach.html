@@ -13,15 +13,17 @@
 <body class="trang">
     <header>
         <p><strong>JadeHub</strong> — Minh bạch nguồn gốc & Thẩm định ngọc quý</p>
-        <nav>
+        <button class="nut-menu" type="button" aria-controls="menu-chinh" aria-expanded="false">☰ Danh mục</button>
+        <nav id="menu-chinh" class="menu">
             <ul>
                 <li><a href="index.html">Trang chủ</a></li>
                 <li><a href="danh-sach.html">Danh mục ngọc</a></li>
-                <li><a href="chi-tiet.html">Viên ngọc tiêu biểu</a></li>
+                <li><a href="chi-tiet.html?id=1">Viên ngọc tiêu biểu</a></li>
                 <li><a href="gioi-thieu.html">Giới thiệu</a></li>
                 <li><a href="lien-he.html">Liên hệ & Thẩm định</a></li>
             </ul>
         </nav>
+        <p class="so-yeu-thich">Đã yêu thích: <span class="dem-yeu-thich">0</span></p>
     </header>
 
     <main>
@@ -29,6 +31,17 @@
         <section class="danh-muc-san-pham">
             <h2>Sản phẩm ngọc quý nổi bật</h2>
 
+            <div class="bo-loc-san-pham">
+                <label for="tim-san-pham">Tìm sản phẩm</label>
+                <input id="tim-san-pham" type="search" placeholder="Nhập tên ngọc, có thể không dấu">
+                <label for="loc-danh-muc">Danh mục</label>
+                <select id="loc-danh-muc"><option value="">Tất cả</option><option>Phỉ thúy</option><option>Cẩm thạch</option><option>Ngọc bích</option></select>
+                <label for="sap-xep">Sắp xếp</label>
+                <select id="sap-xep"><option value="ten">Theo tên</option><option value="gia-tang">Giá tăng dần</option><option value="gia-giam">Giá giảm dần</option></select>
+            </div>
+            <p id="trang-thai-danh-sach" role="status" aria-live="polite"></p>
+            <div id="danh-sach-dong" class="luoi-san-pham"></div>
+            <div id="san-pham-tinh">
             <div class="luoi-san-pham">
 
                 <article class="the-san-pham">
@@ -44,7 +57,7 @@
                             18.500.000 VNĐ
                         </p>
 
-                        <a href="chi-tiet.html">Xem chi tiết</a>
+                        <a href="chi-tiet.html?id=1">Xem chi tiết</a>
                     </div>
                 </article>
 
@@ -62,7 +75,7 @@
                             45.000.000 VNĐ
                         </p>
 
-                        <a href="chi-tiet-vong-tay.html">Xem chi tiết</a>
+                        <a href="chi-tiet.html?id=2">Xem chi tiết</a>
                     </div>
                 </article>
 
@@ -80,7 +93,7 @@
                             9.200.000 VNĐ
                         </p>
 
-                        <a href="chi-tiet-day-chuyen.html">Xem chi tiết</a>
+                        <a href="chi-tiet.html?id=3">Xem chi tiết</a>
                     </div>
                 </article>
 
@@ -98,10 +111,11 @@
                             12.000.000 VNĐ
                         </p>
 
-                        <a href="chi-tiet-chuoi-hat.html">Xem chi tiết</a>
+                        <a href="chi-tiet.html?id=4">Xem chi tiết</a>
                     </div>
                 </article>
 
+            </div>
             </div>
         </section>
 
@@ -132,7 +146,7 @@
                             <td>Myanmar</td>
                             <td>18.500.000</td>
                             <td>Đã thẩm định (PNJ Lab)</td>
-                            <td><a href="chi-tiet.html">Xem chi tiết</a></td>
+                            <td><a href="chi-tiet.html?id=1">Xem chi tiết</a></td>
                         </tr>
                         <tr>
                             <th scope="row">JADE-02</th>
@@ -141,7 +155,7 @@
                             <td>Myanmar</td>
                             <td>45.000.000</td>
                             <td>Đã thẩm định (LiuLab)</td>
-                            <td><a href="chi-tiet-vong-tay.html">Xem chi tiết</a></td>
+                            <td><a href="chi-tiet.html?id=2">Xem chi tiết</a></td>
                         </tr>
                         <tr>
                             <th scope="row">JADE-03</th>
@@ -150,7 +164,7 @@
                             <td>Tân Cương</td>
                             <td>9.200.000</td>
                             <td>Đã thẩm định (DOJI Lab)</td>
-                            <td><a href="chi-tiet-day-chuyen.html">Xem chi tiết</a></td>
+                            <td><a href="chi-tiet.html?id=3">Xem chi tiết</a></td>
                         </tr>
                         <tr>
                             <th scope="row">JADE-04</th>
@@ -159,7 +173,7 @@
                             <td>Myanmar</td>
                             <td>12.000.000</td>
                             <td>Chờ thẩm định bổ sung</td>
-                            <td><a href="chi-tiet-chuoi-hat.html">Xem chi tiết</a></td>
+                            <td><a href="chi-tiet.html?id=4">Xem chi tiết</a></td>
                         </tr>
                     </tbody>
                 </table>
@@ -170,6 +184,8 @@
     <footer>
         <p>&copy; 2026 Nhóm 06 — Học phần Thiết kế và Lập trình Web — Khoa Toán – Tin, Trường ĐH Sư phạm – ĐHĐN.</p>
     </footer>
+    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/trang-danh-sach.js"></script>
 </body>
 
 </html>
