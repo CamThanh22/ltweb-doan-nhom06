@@ -1,0 +1,40 @@
+/* Tùy biến bảng màu JadeHub sau khi nạp Bootstrap. */
+:root {
+    --bs-primary: #176b55;
+    --bs-primary-rgb: 23, 107, 85;
+    --bs-success: #176b55;
+    --bs-success-rgb: 23, 107, 85;
+    --bs-link-color: #176b55;
+    --bs-link-color-rgb: 23, 107, 85;
+    --bs-link-hover-color: #0f4f3f;
+    --bs-link-hover-color-rgb: 15, 79, 63;
+}
+
+/* Bootstrap đặt biến nút ngay trên từng lớp .btn-*, cần đổi tại đó. */
+.btn-success {
+    --bs-btn-bg: #176b55;
+    --bs-btn-border-color: #176b55;
+    --bs-btn-hover-bg: #0f4f3f;
+    --bs-btn-hover-border-color: #0f4f3f;
+    --bs-btn-active-bg: #0f4f3f;
+    --bs-btn-active-border-color: #0f4f3f;
+    --bs-btn-disabled-bg: #176b55;
+    --bs-btn-disabled-border-color: #176b55;
+}
+
+.btn-outline-success {
+    --bs-btn-color: #176b55;
+    --bs-btn-border-color: #176b55;
+    --bs-btn-hover-bg: #176b55;
+    --bs-btn-hover-border-color: #176b55;
+    --bs-btn-active-bg: #0f4f3f;
+    --bs-btn-active-border-color: #0f4f3f;
+    --bs-btn-disabled-color: #176b55;
+    --bs-btn-disabled-border-color: #176b55;
+}
+
+.table-success {
+    --bs-table-bg: #e8f2ee;
+    --bs-table-border-color: #c5ddd3;
+    --bs-table-color: #0f4f3f;
+}

@@ -207,50 +207,6 @@ nav a:active {
 }
 
 /* ==================================================
-   07. RESPONSIVE - TABLET
-   Từ 768px trở lên
-   ================================================== */
-
-@media (min-width: 768px) {
-
-    /* Menu chuyển từ cột thành hàng ngang */
-    nav ul {
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-
-    nav a {
-        padding: 10px 18px;
-    }
-
-    /* Hero rộng và thoáng hơn */
-    .hero {
-        padding: 48px 32px;
-    }
-
-    .hero h1 {
-        font-size: 2.2rem;
-    }
-
-    /* Các thẻ giới thiệu nằm cạnh nhau khi đủ chỗ */
-    .luoi-gioi-thieu {
-        justify-content: center;
-    }
-
-    .bo-cuc-chi-tiet {
-        grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr);
-        align-items: start;
-    }
-
-    .thong-tin-phu {
-        position: sticky;
-        top: var(--khoang-vua);
-    }
-}
-
-/* ==================================================
    06.1. NỘI DUNG TRANG CHỦ
    ================================================== */
 
@@ -573,29 +529,7 @@ main {
     transform: scale(0.98);
 }
 
-/* ==================================================
-   08. RESPONSIVE - DESKTOP
-   Từ 1200px trở lên
-   ================================================== */
 
-@media (min-width: 1200px) {
-
-    main {
-        padding: 32px 24px;
-    }
-
-    .hero {
-        padding: 64px 48px;
-    }
-
-    .hero h1 {
-        font-size: 2.6rem;
-    }
-
-    .the-gioi-thieu {
-        padding: 24px;
-    }
-}
 
 
 
@@ -646,4 +580,72 @@ th {
     margin: 16px 0;
     border-left: 4px solid #d4af37;
     background-color: #fffbea;
+}
+
+/* ==================================================
+   07. RESPONSIVE - TABLET
+   Từ 768px trở lên
+   ================================================== */
+
+@media (min-width: 768px) {
+
+    /* Menu chuyển từ cột thành hàng ngang */
+    nav ul {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    nav a {
+        padding: 10px 18px;
+    }
+
+    /* Hero rộng và thoáng hơn */
+    .hero {
+        padding: 48px 32px;
+    }
+
+    .hero h1 {
+        font-size: 2.2rem;
+    }
+
+    /* Các thẻ giới thiệu nằm cạnh nhau khi đủ chỗ */
+    .luoi-gioi-thieu {
+        justify-content: center;
+    }
+
+    .bo-cuc-chi-tiet {
+        grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr);
+        align-items: start;
+    }
+
+    .thong-tin-phu {
+        position: sticky;
+        top: var(--khoang-vua);
+    }
+}
+
+/* ==================================================
+   08. RESPONSIVE - DESKTOP
+   Từ 1200px trở lên
+   ================================================== */
+
+@media (min-width: 1200px) {
+
+    main {
+        padding: 32px 24px;
+    }
+
+    .hero {
+        padding: 64px 48px;
+    }
+
+    .hero h1 {
+        font-size: 2.6rem;
+    }
+
+    .the-gioi-thieu {
+        padding: 24px;
+    }
 }
