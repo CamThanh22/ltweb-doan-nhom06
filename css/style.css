@@ -650,22 +650,231 @@ th {
     }
 }
 
-/* Bài tập 4: menu và điều khiển tương tác */
-.nut-menu { display: none; color: var(--mau-trang); background: var(--mau-chinh-dam); border: 1px solid var(--mau-trang); padding: 10px 16px; border-radius: var(--bo-goc); cursor: pointer; }
-.so-yeu-thich { color: var(--mau-trang); margin: 8px 0 0; }
-.bo-loc-san-pham { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 16px 0; }
-.bo-loc-san-pham input, .bo-loc-san-pham select { max-width: 100%; padding: 8px; }
-.noi-dung-the button, #chi-tiet-dong button, #trang-thai-danh-sach button, #trang-thai-chi-tiet button { margin: 8px; padding: 8px 12px; cursor: pointer; }
-.loi-truong { display: block; color: #9b1c1c; font-size: .9rem; }
-.loi-truong:empty { display: none; }
-#chi-tiet-dong img { max-width: 100%; height: auto; }
-@media (max-width: 767px) {
-    .js .nut-menu { display: inline-block; }
-    .js .menu { display: none; }
-    .js .menu.mo { display: block; }
+
+/* ==================================================
+   10. CHƯƠNG 4 - JAVASCRIPT VÀ TRẠNG THÁI TƯƠNG TÁC
+   ================================================== */
+
+
+/* ==================================================
+   MENU MOBILE
+   ================================================== */
+
+.nut-menu {
+    display: none;
+
+    margin: 8px auto;
+    padding: 10px 16px;
+
+    font: inherit;
+    font-weight: bold;
+
+    color: var(--mau-trang);
+    background-color: var(--mau-chinh-dam);
+
+    border: 1px solid var(--mau-trang);
+    border-radius: 8px;
+
+    cursor: pointer;
 }
-.ca-nhan-toi { background: #182824; color: #f7f8f7; }
-.ca-nhan-toi main { background: #182824; color: #f7f8f7; }
-.ca-nhan-toi a { color: #b4ead6; }
-[hidden] { display: none !important; }
-@media print { .nut-menu, main button, main input { display: none !important; } }
+
+.nut-menu:hover {
+    background-color: var(--mau-chinh);
+}
+
+
+/* ==================================================
+   SỐ LƯỢNG SẢN PHẨM YÊU THÍCH
+   ================================================== */
+
+.tom-tat-yeu-thich {
+    margin: 8px 0 0;
+}
+
+.tom-tat-yeu-thich a {
+    color: var(--mau-trang);
+    font-weight: bold;
+}
+
+
+/* ==================================================
+   BỘ LỌC DANH SÁCH SẢN PHẨM
+   ================================================== */
+
+.bo-loc {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+
+    gap: var(--khoang-nho);
+
+    margin-bottom: var(--khoang-vua);
+}
+
+.bo-loc label {
+    font-weight: bold;
+}
+
+.bo-loc input,
+.bo-loc select {
+    width: 100%;
+    max-width: 100%;
+
+    padding: 10px;
+
+    font: inherit;
+    color: var(--mau-chu);
+
+    background-color: var(--mau-trang);
+
+    border: 1px solid #aaaaaa;
+    border-radius: 8px;
+}
+
+
+/* ==================================================
+   LƯỚI SẢN PHẨM ĐỘNG
+   ================================================== */
+
+.luoi-san-pham {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit,
+            minmax(min(230px, 100%), 1fr));
+
+    gap: var(--khoang-vua);
+
+    width: 100%;
+}
+
+.the-san-pham {
+    min-width: 0;
+    overflow: hidden;
+
+    background-color: var(--mau-trang);
+
+    border: 1px solid var(--mau-vien);
+    border-radius: var(--bo-goc);
+}
+
+.the-san-pham img {
+    width: 100%;
+    height: auto;
+
+    aspect-ratio: 4 / 3;
+
+    object-fit: cover;
+}
+
+.noi-dung-the {
+    padding: var(--khoang-vua);
+}
+
+.noi-dung-the h3 {
+    margin-top: 0;
+}
+
+.gia-san-pham {
+    font-weight: bold;
+    color: var(--mau-chinh-dam);
+}
+
+
+/* ==================================================
+   NÚT YÊU THÍCH
+   ================================================== */
+
+.nut-yeu-thich {
+    display: block;
+
+    width: fit-content;
+
+    margin-top: 12px;
+    padding: 9px 12px;
+
+    font: inherit;
+
+    color: var(--mau-chinh-dam);
+    background-color: var(--mau-trang);
+
+    border: 1px solid var(--mau-chinh);
+    border-radius: 8px;
+
+    cursor: pointer;
+}
+
+.nut-yeu-thich:hover {
+    color: var(--mau-trang);
+    background-color: var(--mau-chinh);
+}
+
+.nut-yeu-thich[aria-pressed="true"] {
+    font-weight: bold;
+
+    color: var(--mau-trang);
+    background-color: var(--mau-chinh);
+}
+
+
+/* ==================================================
+   THÔNG BÁO LỖI FORM
+   ================================================== */
+
+.loi-truong {
+    display: block;
+
+    min-height: 1.4em;
+    margin-top: 4px;
+
+    color: #a40000;
+    font-size: 0.9rem;
+}
+
+
+/* ==================================================
+   NÚT FORM
+   ================================================== */
+
+.form-tham-dinh button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+
+/* ==================================================
+   RESPONSIVE MENU MOBILE
+   ================================================== */
+
+@media (max-width: 767px) {
+
+    .js .nut-menu {
+        display: block;
+    }
+
+    .js nav ul {
+        display: none;
+    }
+
+    .js nav ul.mo {
+        display: flex;
+    }
+}
+
+
+/* ==================================================
+   TABLET TRỞ LÊN
+   ================================================== */
+
+@media (min-width: 768px) {
+
+    .bo-loc {
+        grid-template-columns:
+            auto minmax(160px, 1fr) auto minmax(160px, 1fr) auto minmax(160px, 1fr);
+
+        align-items: center;
+    }
+}
+
+[hidden] {
+    display: none !important;
+}

@@ -1,37 +1,319 @@
+/*
+ * Hiển thị chi tiết một sản phẩm JadeHub theo id trên URL.
+ * Dữ liệu sản phẩm được đọc từ data/san-pham.json.
+ * Cập nhật ảnh, chứng thư, bảng kiểm định và thông tin sản phẩm.
+ * Hỗ trợ yêu thích và tự tạo danh sách sản phẩm liên quan.
+ */
+
 import { taiJSON } from './api.js';
-import { docYeuThich } from './yeu-thich.js';
-const khung=document.querySelector('#chi-tiet-dong');
-const trangThai=document.querySelector('#trang-thai-chi-tiet');
-const id=Number(new URLSearchParams(location.search).get('id'));
-function p(label,value) {
-  const el=document.createElement('p');
-  const strong=document.createElement('strong'); strong.textContent=label+': ';
-  el.append(strong,document.createTextNode(String(value)));
-  return el;
+
+import {
+    daoYeuThich,
+    coYeuThich
+} from './yeu-thich.js';
+
+const khungChiTiet =
+    document.querySelector('#chi-tiet-dong');
+
+const trangThai =
+    document.querySelector('#trang-thai-chi-tiet');
+
+const danhSachLienQuan =
+    document.querySelector('#san-pham-lien-quan');
+
+
+// =========================
+// ĐỌC ID TRÊN URL
+// =========================
+
+const thamSo =
+    new URLSearchParams(location.search);
+
+const id =
+    Number(thamSo.get('id') || 1);
+
+
+// =========================
+// GÁN NỘI DUNG
+// =========================
+
+function ganNoiDung(selector, noiDung) {
+    const phanTu =
+        khungChiTiet.querySelector(selector);
+
+    if (phanTu) {
+        phanTu.textContent = noiDung;
+    }
 }
-async function tai() {
-  trangThai.textContent='Đang tải thông tin sản phẩm…';
-  try {
-    const ds=await taiJSON('data/san-pham.json');
-    if (!Array.isArray(ds)) throw new Error('Dữ liệu không hợp lệ');
-    const sp=ds.find(x=>x.id===id);
-    if (!sp) { khung.replaceChildren(); trangThai.textContent='Không tìm thấy sản phẩm có mã này.'; document.querySelector('#chi-tiet-tinh').hidden=true; return; }
-    document.title=`${sp.ten} | JadeHub`;
-    const article=document.createElement('article');
-    const h=document.createElement('h2'); h.textContent=sp.ten;
-    const img=document.createElement('img'); img.src=sp.hinh; img.alt=sp.ten; img.width=450; img.height=338;
-    const button=document.createElement('button'); button.type='button'; button.dataset.yeuThich=String(sp.id);
-    button.textContent=docYeuThich().includes(sp.id)?'Bỏ yêu thích':'Yêu thích';
-    button.setAttribute('aria-pressed',String(docYeuThich().includes(sp.id)));
-    button.setAttribute('aria-label',`Yêu thích ${sp.ten}`);
-    article.append(h,img,p('Mã',`JADE-${String(sp.id).padStart(2,'0')}`),p('Loại',sp.loai),p('Xuất xứ',sp.xuatXu),p('Giá',new Intl.NumberFormat('vi-VN').format(sp.gia)+' VNĐ'),p('Tình trạng',sp.tinhTrang),p('Mô tả',sp.moTa),button);
-    khung.replaceChildren(article);
-    trangThai.textContent='Đã tải thông tin sản phẩm.';
-    document.querySelector('#chi-tiet-tinh').hidden=true;
-  } catch(loi) {
-    console.error('Không tải được chi tiết:',loi);
-    trangThai.textContent='Không tải được dữ liệu. Vui lòng kiểm tra kết nối và thử lại. ';
-    const btn=document.createElement('button'); btn.type='button'; btn.textContent='Thử lại'; btn.addEventListener('click',tai); trangThai.append(btn);
-  }
+
+
+// =========================
+// HIỂN THỊ SẢN PHẨM LIÊN QUAN
+// =========================
+
+function hienThiLienQuan(danhSach, sanPhamHienTai) {
+    if (!danhSachLienQuan) {
+        return;
+    }
+
+    danhSachLienQuan.replaceChildren();
+
+    const lienQuan = danhSach
+        .filter(
+            (sanPham) =>
+                sanPham.id !== sanPhamHienTai.id
+        )
+        .slice(0, 3);
+
+    lienQuan.forEach((sanPham) => {
+        const li =
+            document.createElement('li');
+
+        const link =
+            document.createElement('a');
+
+        link.href =
+            `chi-tiet.html?id=${sanPham.id}`;
+
+        link.textContent =
+            sanPham.ten;
+
+        li.append(link);
+        danhSachLienQuan.append(li);
+    });
 }
-tai();
+
+
+// =========================
+// HIỂN THỊ CHI TIẾT
+// =========================
+
+function hienThiSanPham(sanPham, danhSach) {
+
+    document.title =
+        `${sanPham.ten} | JadeHub`;
+
+    ganNoiDung(
+        '[data-ten]',
+        `${sanPham.ten} - Mã số ${sanPham.ma}`
+    );
+
+    ganNoiDung(
+        '[data-mota]',
+        sanPham.moTa
+    );
+
+    ganNoiDung(
+        '[data-ma]',
+        sanPham.ma
+    );
+
+    ganNoiDung(
+        '[data-loai]',
+        sanPham.loai
+    );
+
+    ganNoiDung(
+        '[data-xuatxu]',
+        sanPham.xuatXu
+    );
+
+    ganNoiDung(
+        '[data-kiem-dinh]',
+        sanPham.kiemDinh
+    );
+
+
+    // Xác định loại khoáng vật
+    const khoangVat =
+        sanPham.loai.includes('Nephrite')
+            ? 'Nephrite tự nhiên'
+            : 'Jadeite tự nhiên';
+
+    ganNoiDung(
+        '[data-khoang]',
+        khoangVat
+    );
+
+    ganNoiDung(
+        '[data-trongluong]',
+        sanPham.trongLuong
+    );
+
+    ganNoiDung(
+        '[data-docung]',
+        sanPham.doCung
+    );
+
+    ganNoiDung(
+        '[data-chietsuat]',
+        sanPham.chietSuat
+    );
+
+    ganNoiDung(
+        '[data-tytrong]',
+        sanPham.tyTrong
+    );
+
+
+    // =====================
+    // ẢNH SẢN PHẨM
+    // =====================
+
+    const anh =
+        khungChiTiet.querySelector(
+            '[data-anh]'
+        );
+
+    if (anh) {
+        anh.src =
+            `images/${sanPham.anh}`;
+
+        anh.alt =
+            `Ảnh sản phẩm ${sanPham.ten}`;
+    }
+
+
+    // =====================
+    // ẢNH CHỨNG THƯ
+    // =====================
+
+    const chungThu =
+        khungChiTiet.querySelector(
+            '[data-chungthu]'
+        );
+
+    if (chungThu) {
+        const chuThichChungThu =
+            chungThu.closest('figure')?.querySelector('figcaption');
+
+        if (sanPham.anhChungThu) {
+            // Sản phẩm đã có ảnh chứng thư
+            chungThu.hidden = false;
+            chungThu.src = `images/${sanPham.anhChungThu}`;
+            chungThu.alt = `Chứng thư kiểm định ${sanPham.ma}`;
+
+            if (chuThichChungThu) {
+                chuThichChungThu.textContent =
+                    `Chứng thư kiểm định của ${sanPham.ma}`;
+            }
+        } else {
+            // Sản phẩm chưa có ảnh chứng thư
+            chungThu.hidden = true;
+
+            if (chuThichChungThu) {
+                chuThichChungThu.textContent =
+                    'Ảnh chứng thư kiểm định đang chờ bổ sung sau khi hoàn tất hồ sơ thẩm định.';
+            }
+        }
+    }
+
+
+    // =====================
+    // YÊU THÍCH
+    // =====================
+
+    const nutYeuThich =
+        khungChiTiet.querySelector(
+            '[data-yeuthich]'
+        );
+
+    if (nutYeuThich) {
+        function capNhatNutYeuThich() {
+            const dangYeuThich =
+                coYeuThich(sanPham.id);
+
+            nutYeuThich.textContent =
+                dangYeuThich
+                    ? '♥ Bỏ yêu thích'
+                    : '♡ Thêm vào yêu thích';
+
+            nutYeuThich.setAttribute(
+                'aria-pressed',
+                String(dangYeuThich)
+            );
+        }
+
+        nutYeuThich.addEventListener(
+            'click',
+            () => {
+                daoYeuThich(sanPham.id);
+                capNhatNutYeuThich();
+            }
+        );
+
+        capNhatNutYeuThich();
+    }
+
+    // Sản phẩm liên quan
+    hienThiLienQuan(
+        danhSach,
+        sanPham
+    );
+}
+
+
+// =========================
+// TẢI JSON
+// =========================
+
+async function taiChiTietSanPham() {
+    try {
+        trangThai.textContent =
+            'Đang tải thông tin sản phẩm…';
+
+        const danhSach =
+            await taiJSON(
+                'data/san-pham.json'
+            );
+
+        const sanPham =
+            danhSach.find(
+                (item) => item.id === id
+            );
+
+
+        // Không tìm thấy ID
+        if (!sanPham) {
+            khungChiTiet.hidden = true;
+            trangThai.replaceChildren();
+
+            const thongBao = document.createElement('p');
+            thongBao.textContent = 'Không tìm thấy sản phẩm.';
+            trangThai.append(thongBao);
+            return;
+        }
+
+
+        hienThiSanPham(
+            sanPham,
+            danhSach
+        );
+
+        trangThai.textContent = '';
+
+    } catch (error) {
+        console.error(
+            'Không thể tải chi tiết sản phẩm:',
+            error
+        );
+
+        // Giữ nội dung tĩnh trong HTML làm phương án dự phòng.
+        khungChiTiet.hidden = false;
+        trangThai.replaceChildren();
+
+        const thongBao = document.createElement('p');
+        thongBao.textContent =
+            'Không tải được dữ liệu mới. ' +
+            'Đang hiển thị nội dung dự phòng.';
+
+        const nutThuLai = document.createElement('button');
+        nutThuLai.type = 'button';
+        nutThuLai.textContent = 'Thử lại';
+        nutThuLai.addEventListener('click', taiChiTietSanPham);
+
+        trangThai.append(thongBao, nutThuLai);
+    }
+}
+
+taiChiTietSanPham();
