@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta
+        content="Bảng danh mục các loại ngọc phỉ thúy, ngọc bích, cẩm thạch thiên nhiên đang niêm yết tại sàn giao dịch JadeHub."
+        name="description" />
+    <title>Danh mục ngọc quý niêm yết | JadeHub</title>
+    <link href="css/style.css" rel="stylesheet" />
+</head>
+
+<body class="trang">
+    <header>
+        <p><strong>JadeHub</strong> — Minh bạch nguồn gốc &amp; Thẩm định ngọc quý</p>
+        <nav>
+            <ul>
+                <li><a href="index.html">Trang chủ</a></li>
+                <li><a href="danh-sach.html">Danh mục ngọc</a></li>
+                <li><a href="chi-tiet.html">Viên ngọc tiêu biểu</a></li>
+                <li><a href="gioi-thieu.html">Giới thiệu</a></li>
+                <li><a href="lien-he.html">Liên hệ &amp; Thẩm định</a></li>
+            </ul>
+        </nav>
+        <p class="tom-tat-yeu-thich"><a href="danh-sach.html">Yêu thích: <span data-dem-yeu-thich="">0</span></a></p>
+    </header>
+    <main>
+        <h1>Danh mục các loại ngọc quý đang giao dịch</h1>
+
+        <section>
+            <h2>Tìm kiếm, lọc và sắp xếp sản phẩm</h2>
+
+            <div class="bo-loc">
+                <label for="tim-kiem">Tìm sản phẩm</label>
+                <input id="tim-kiem" type="search" placeholder="Gõ tên, mã hoặc loại ngọc…">
+
+                <label for="loc-loai">Lọc theo loại</label>
+                <select id="loc-loai">
+                    <option value="">Tất cả</option>
+                </select>
+
+                <label for="sap-xep">Sắp xếp</label>
+                <select id="sap-xep">
+                    <option value="mac-dinh">Mặc định</option>
+                    <option value="gia-tang">Giá tăng dần</option>
+                    <option value="gia-giam">Giá giảm dần</option>
+                    <option value="ten">Tên A–Z</option>
+                </select>
+            </div>
+
+            <p id="trang-thai-ds" aria-live="polite">
+                Đang tải danh sách sản phẩm…
+            </p>
+
+            <div class="luoi-san-pham" id="ds-dong" aria-live="polite">
+            </div>
+
+            <noscript>
+                JavaScript đang tắt. Bạn vẫn có thể xem các sản phẩm
+                tiêu biểu ở trang chủ và liên hệ JadeHub.
+            </noscript>
+        </section>
+    </main>
+    <footer>
+        <p> © 2026 Nhóm 06 — Học phần Thiết kế và Lập trình Web — Khoa Toán – Tin, Trường ĐH Sư phạm – ĐHĐN.</p>
+    </footer>
+    <script src="js/main.js" type="module">
+    </script>
+    <script src="js/trang-danh-sach.js" type="module">
+    </script>
+</body>
+
+</html>
