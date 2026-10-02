@@ -2,7 +2,7 @@
  * JavaScript cho trang cá nhân Nguyễn Nhật Ánh Hồng.
  * Tương tác 1: tăng, giảm và đặt lại cỡ chữ của nội dung chính.
  * Tương tác 2: thu gọn hoặc mở rộng bảng thời khóa biểu.
- * Cách thử: dùng các nút A+, A−, Mặc định và nút Ẩn/hiện thời khóa biểu.
+ * Cách thử: dùng các nút A+, A−, Mặc định , nút Ẩn/hiện thời khóa biểu.
  */
 
 const main = document.querySelector('main');
