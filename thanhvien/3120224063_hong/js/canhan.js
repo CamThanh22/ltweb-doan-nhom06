@@ -47,7 +47,7 @@ if (main) {
         capNhatCoChu();
     });
 
-    // Tương tác 2: thu gọn / mở rộng bảng thời khóa biểu.
+    // Tương tác 2: thu gọn / mở rộng bảng thời khóa biểu ca nhan.
     const bang = main.querySelector('table');
     const nutBang = document.createElement('button');
     nutBang.type = 'button';
