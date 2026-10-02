@@ -2,7 +2,7 @@
  * JavaScript cho trang cá nhân Huỳnh Trần Phương Trinh.
  * Tương tác 1: hiển thị thanh tiến độ đọc khi cuộn trang.
  * Tương tác 2: nút quay trở lại đầu trang.
- * Cách thử: cuộn trang xuống và nhấn nút Đầu trang.
+ * Cách thử: cuộn trang xuống và nhấn nút đầu trang.
  */
 
 const thanhTienDo = document.createElement('div');

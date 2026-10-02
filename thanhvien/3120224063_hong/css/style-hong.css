@@ -2,7 +2,7 @@
    TRANG CÁ NHÂN - NGUYỄN NHẬT ÁNH HỒNG
    ========================================= */
 
-/* Bố cục nội dung */
+/* Bố cục nội dung của trang */
 main {
     width: min(100% - 32px, 1000px);
     margin: 0 auto;
@@ -34,7 +34,7 @@ article li {
     margin-bottom: 8px;
 }
 
-/* Bảng thời khóa biểu */
+/* Bảng thời khóa biểu cá nhân */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -80,7 +80,7 @@ a:focus-visible {
     }
 }
 
-/* Khu vực tương tác JavaScript cá nhân */
+/* Khu vực JavaScript cá nhân */
 .tuong-tac-ca-nhan {
     display: flex;
     align-items: center;
