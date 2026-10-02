@@ -2,7 +2,7 @@
  * JavaScript cho trang cá nhân Bouakeo.
  * Tương tác 1: lọc và làm nổi bật kỹ năng theo từ khóa người dùng nhập.
  * Tương tác 2: ẩn hoặc hiện ảnh chân dung bằng nút bấm.
- * Cách thử: nhập từ khóa kỹ năng và nhấn nút Ẩn/hiện ảnh chân dung.
+ * Cách thử: nhập từ khóa kỹ năng và nhấn nút Ẩn/Hiện ảnh chân dung.
  */
 
 const main = document.querySelector('main');
