@@ -1,0 +1,11 @@
+# Thư viện do Composer cài, dữ liệu phát sinh khi chạy: không commit
+/vendor/
+/logs/*
+!/logs/.htaccess
+/storage/*
+!/storage/.htaccess
+/uploads/*
+!/uploads/.gitkeep
+!/uploads/.htaccess
+cookie.txt
+*.log

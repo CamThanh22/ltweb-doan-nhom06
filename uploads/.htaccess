@@ -1,0 +1,4 @@
+# Ảnh tải lên chỉ để xem: không cho chạy mã PHP trong thư mục này
+<FilesMatch "\.(php|phtml|phar)$">
+    Require all denied
+</FilesMatch>
