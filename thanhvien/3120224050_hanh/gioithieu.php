@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 }
-$luuBut = $khoLuuBut->moiNhat(5);       // năm lời nhắn mới nhất
+$luuBut = $khoLuuBut->moiNhat(5);       // năm lời nhắn mới nhất.
 
 $goc = '../../';                      // đường dẫn từ trang này về thư mục gốc
 $tieuDe = 'Hồ sơ cá nhân | Nguyễn Thị Bích Hạnh';
