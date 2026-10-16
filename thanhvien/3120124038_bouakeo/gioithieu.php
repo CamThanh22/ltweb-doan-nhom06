@@ -9,7 +9,7 @@ use App\Data\KhoJsonl;
 
 
 // Chức năng 1: nhớ tên khách bằng cookie bouakeo_khach (đọc lại phải kiểm tra, không tin cookie)
-$tenKhach = $_COOKIE['bouakeo_khach'] ?? '';
+$TenKhach = $_COOKIE['bouakeo_khach'] ?? '';
 if (!is_string($tenKhach) || mb_strlen($tenKhach) < 2 || mb_strlen($tenKhach) > 30
     || preg_match('/^[\p{L} .\'-]+$/u', $tenKhach) !== 1) {
     $tenKhach = '';
