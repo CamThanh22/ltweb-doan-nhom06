@@ -8,8 +8,8 @@ require __DIR__ . '/../../inc/config.php';
 
 
 // Chức năng 1: danh sách kỹ năng lọc theo nhóm bằng tham số GET ?nhom= (dữ liệu từ mảng PHP)
-$nhomKyNang = ['web' => 'Lập trình web', 'cong-cu' => 'Công cụ', 'he-thong' => 'Hệ thống'];
-$kyNang = [
+$nhomKiNang = ['web' => 'Lập trình web', 'cong-cu' => 'Công cụ', 'he-thong' => 'Hệ thống'];
+$kiNang = [
     ['nhom' => 'web', 'ten' => 'Lập trình Web (HTML5, CSS3, PHP, JavaScript)'],
     ['nhom' => 'cong-cu', 'ten' => 'Quản lý mã nguồn với Git & GitHub'],
     ['nhom' => 'he-thong', 'ten' => 'Quản trị hệ thống Linux cơ bản'],
