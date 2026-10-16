@@ -878,3 +878,212 @@ th {
 [hidden] {
     display: none !important;
 }
+
+/* ==================================================
+   11. CHƯƠNG 5 - PHP: THÔNG BÁO, GIỎ HÀNG, QUẢN TRỊ
+   ================================================== */
+
+/* Liên kết "bỏ qua tới nội dung": chỉ hiện khi nhận focus bằng bàn phím */
+.bo-qua {
+    position: absolute;
+    left: 8px;
+    top: -60px;
+    z-index: 100;
+    padding: 8px 12px;
+    color: var(--mau-trang);
+    background-color: var(--mau-chinh-dam);
+    border-radius: 0 0 8px 8px;
+}
+
+.bo-qua:focus {
+    top: 0;
+}
+
+/* Thông báo flash và lỗi chung */
+.thong-bao {
+    margin: var(--khoang-vua) 0;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid;
+}
+
+.thong-bao.thanh-cong {
+    color: #0b4a2f;
+    background-color: #e6f4ec;
+    border-color: #8cc9a6;
+}
+
+.thong-bao.loi {
+    color: #8a0000;
+    background-color: #fdeaea;
+    border-color: #e0a0a0;
+}
+
+/* Header: dòng giỏ hàng / yêu thích / người dùng tự xuống dòng ở màn hình hẹp */
+.tom-tat-yeu-thich {
+    overflow-wrap: anywhere;
+}
+
+.ten-nguoi-dung {
+    font-weight: normal;
+}
+
+/* Nút yêu thích cần JavaScript: không có JS thì ẩn */
+html:not(.js) .nut-yeu-thich {
+    display: none;
+}
+
+/* Nút dùng chung */
+.nut-chinh,
+.nut-loc,
+.form-gio button,
+.form-dang-nhap button {
+    padding: 10px 16px;
+    font: inherit;
+    font-weight: bold;
+    color: var(--mau-trang);
+    background-color: var(--mau-chinh-dam);
+    border: 1px solid var(--mau-chinh-dam);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.nut-phu {
+    padding: 9px 14px;
+    font: inherit;
+    color: var(--mau-chinh-dam);
+    background-color: var(--mau-trang);
+    border: 1px solid var(--mau-chinh);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.nut-chinh:hover,
+.nut-loc:hover,
+.form-gio button:hover {
+    background-color: var(--mau-chinh);
+}
+
+/* Form số lượng ở chi tiết và giỏ hàng */
+.form-gio {
+    display: grid;
+    gap: var(--khoang-nho);
+    margin: var(--khoang-vua) 0;
+}
+
+.form-gio input[type="number"] {
+    width: 100%;
+    max-width: 8rem;
+    padding: 9px;
+    font: inherit;
+    border: 1px solid #aaaaaa;
+    border-radius: 8px;
+}
+
+/* Giỏ hàng: danh sách dòng, không dùng bảng để không cuộn ngang ở 360px */
+.ds-gio {
+    display: grid;
+    gap: var(--khoang-vua);
+    padding: 0;
+    list-style: none;
+}
+
+.dong-gio {
+    display: grid;
+    grid-template-columns: 80px minmax(0, 1fr);
+    gap: var(--khoang-vua);
+    padding: var(--khoang-vua);
+    background-color: var(--mau-trang);
+    border: 1px solid var(--mau-vien);
+    border-radius: var(--bo-goc);
+}
+
+.dong-gio img {
+    width: 80px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.dong-gio h2 {
+    margin-top: 0;
+    font-size: 1.1rem;
+}
+
+.tong-tien {
+    font-size: 1.15rem;
+}
+
+/* Đăng nhập và biểu mẫu nhỏ */
+.form-dang-nhap {
+    max-width: 28rem;
+}
+
+.form-dang-nhap input {
+    width: 100%;
+    max-width: 100%;
+    padding: 10px;
+    font: inherit;
+    border: 1px solid #aaaaaa;
+    border-radius: 8px;
+}
+
+.bo-loc .nut-loc {
+    justify-self: start;
+}
+
+.form-loc-thu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--khoang-nho);
+    align-items: center;
+    margin-bottom: var(--khoang-vua);
+}
+
+/* Trang quản trị */
+.ds-lien-he {
+    display: grid;
+    gap: var(--khoang-vua);
+}
+
+.the-lien-he {
+    min-width: 0;
+    padding: var(--khoang-vua);
+    overflow-wrap: anywhere;
+    background-color: var(--mau-trang);
+    border: 1px solid var(--mau-vien);
+    border-radius: var(--bo-goc);
+}
+
+.the-lien-he h2 {
+    margin-top: 0;
+    font-size: 1.15rem;
+}
+
+.the-lien-he img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+}
+
+/* Biểu mẫu trong main không bao giờ rộng hơn màn hình */
+main input,
+main select,
+main textarea {
+    max-width: 100%;
+}
+
+main img {
+    max-width: 100%;
+    height: auto;
+}
+
+@media (min-width: 768px) {
+    .ds-lien-he {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .bo-loc .nut-loc {
+        grid-column: 1 / -1;
+    }
+}

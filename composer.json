@@ -1,0 +1,11 @@
+{
+    "name": "nhom06/ltweb-doan",
+    "description": "JadeHub - san giao dich va tham dinh ngoc quy (Bai tap nhom 5, PHP thuan)",
+    "type": "project",
+    "require": {
+        "php": ">=8.1"
+    },
+    "autoload": {
+        "psr-4": { "App\\": "src/" }
+    }
+}

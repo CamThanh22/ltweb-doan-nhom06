@@ -1,8 +1,7 @@
 /*
- * Kiểm tra biểu mẫu đăng ký thẩm định phía client.
- * Dùng Constraint Validation API để kiểm tra dữ liệu từng trường.
- * Gửi dữ liệu giả lập bằng Fetch API với phương thức POST.
- * Khóa nút khi đang gửi và thông báo kết quả bằng aria-live.
+ * Kiểm tra biểu mẫu liên hệ phía client (lớp kiểm tra thứ nhất; máy chủ PHP luôn kiểm tra lại).
+ * Dùng Constraint Validation API để báo lỗi dưới từng ô; nếu hợp lệ thì để trình duyệt gửi
+ * biểu mẫu thật tới lien-he.php (không còn fetch tới JSONPlaceholder), khóa nút khi đang gửi.
  */
 
 const form = document.querySelector('.form-tham-dinh');
@@ -245,173 +244,39 @@ if (!form || !bao) {
 
 
     // ==============================
-    // TẠO DỮ LIỆU GỬI
+    // GỬI FORM (gửi thật tới lien-he.php)
     // ==============================
 
-    function taoPayload() {
-        const formData =
-            new FormData(form);
+    form.addEventListener('submit', (event) => {
+        fields.forEach((field) => {
+            loiRieng(field);
+        });
 
-        const payload =
-            Object.fromEntries(
-                formData.entries()
-            );
-
-        /*
-         * JSONPlaceholder chỉ dùng để giả lập POST,
-         * không nhận file ảnh thật của đồ án.
-         */
-        delete payload.anhngoc;
-
-        /*
-         * Checkbox không được chọn sẽ không xuất hiện
-         * trong FormData. Đến đây checkbox đã hợp lệ,
-         * nên lưu rõ trạng thái true.
-         */
-        payload.camket = true;
-
-        return payload;
-    }
-
-
-    // ==============================
-    // GỬI FORM
-    // ==============================
-
-    form.addEventListener(
-        'submit',
-        async (event) => {
+        if (!form.checkValidity()) {
             event.preventDefault();
+            form.reportValidity();
+            bao.textContent = 'Vui lòng sửa các trường chưa hợp lệ.';
 
-
-            // Kiểm tra lại toàn bộ trường
-            fields.forEach(
-                (field) => {
-                    loiRieng(field);
-                }
-            );
-
-
-            // Dữ liệu chưa hợp lệ
-            if (!form.checkValidity()) {
-                form.reportValidity();
-
-                bao.textContent =
-                    'Vui lòng sửa các trường chưa hợp lệ.';
-
-                /*
-                 * Đưa focus đến trường lỗi đầu tiên
-                 * để hỗ trợ bàn phím và accessibility.
-                 */
-                const truongLoi =
-                    form.querySelector(
-                        ':invalid'
-                    );
-
-                if (truongLoi) {
-                    truongLoi.focus();
-                }
-
-                return;
+            const truongLoi = form.querySelector(':invalid');
+            if (truongLoi) {
+                truongLoi.focus();
             }
-
-
-            // ==========================
-            // TRẠNG THÁI ĐANG GỬI
-            // ==========================
-
-            if (gui) {
-                gui.disabled = true;
-
-                gui.textContent =
-                    'Đang gửi…';
-            }
-
-            bao.textContent =
-                'Đang gửi yêu cầu thẩm định…';
-
-
-            try {
-                const payload =
-                    taoPayload();
-
-
-                const response =
-                    await fetch(
-                        'https://jsonplaceholder.typicode.com/posts',
-                        {
-                            method: 'POST',
-
-                            headers: {
-                                'Content-Type':
-                                    'application/json'
-                            },
-
-                            body:
-                                JSON.stringify(
-                                    payload
-                                )
-                        }
-                    );
-
-
-                // Bắt lỗi HTTP
-                if (!response.ok) {
-                    throw new Error(
-                        `HTTP ${response.status}`
-                    );
-                }
-
-
-                await response.json();
-
-
-                // ==========================
-                // GỬI THÀNH CÔNG
-                // ==========================
-
-                form.reset();
-
-                xoaThongBaoLoi();
-
-                bao.textContent =
-                    'Gửi yêu cầu thành công. ' +
-                    'JadeHub sẽ liên hệ lại với bạn.';
-
-
-                if (ngayHen) {
-                    ngayHen.min =
-                        layNgayHomNay();
-                }
-
-
-            } catch (error) {
-                // ==========================
-                // GỬI THẤT BẠI
-                // ==========================
-
-                console.error(
-                    'Lỗi gửi biểu mẫu:',
-                    error
-                );
-
-                bao.textContent =
-                    'Gửi không thành công. ' +
-                    'Vui lòng kiểm tra kết nối mạng và thử lại.';
-
-
-            } finally {
-                // ==========================
-                // MỞ LẠI NÚT GỬI
-                // ==========================
-
-                if (gui) {
-                    gui.disabled = false;
-
-                    gui.textContent =
-                        'Gửi thông tin thẩm định';
-                }
-            }
+            return;
         }
-    );
+
+        // Hợp lệ: không chặn, trình duyệt gửi POST tới máy chủ; khóa nút để tránh bấm hai lần
+        if (gui) {
+            gui.disabled = true;
+            gui.textContent = 'Đang gửi…';
+        }
+        bao.textContent = 'Đang gửi biểu mẫu…';
+    });
+
+    // Quay lại bằng nút Back (bfcache) thì mở lại nút gửi
+    window.addEventListener('pageshow', () => {
+        if (gui) {
+            gui.disabled = false;
+            gui.textContent = 'Gửi thông tin thẩm định';
+        }
+    });
 }
