@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (KhoLienHe::tenAnhHopLe($tenAnh)) {
             $cu = __DIR__ . '/../../uploads/' . $tenAnh;
             if (is_file($cu)) {
-                unlink($cu);           // xóa ảnh đại diện cũ cho đỡ rác
+                unlink($cu);           // xóa ảnh đại diện cũ
             }
         }
         datFlash('ok', 'Đã cập nhật ảnh đại diện.');
