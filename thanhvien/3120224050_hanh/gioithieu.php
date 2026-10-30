@@ -1,155 +1,203 @@
 <?php
 /**
- * thanhvien/3120224050_hanh/gioithieu.php - trang cá nhân của Nguyễn Thị Bích Hạnh (dùng chung header/footer).
- * Chức năng PHP 1: sổ lưu bút (POST, kiểm tra, storage/3120224050_luubut.jsonl, PRG). 2: bộ đếm lượt xem mỗi phiên một lần.
- * Cách thử: gửi lời nhắn rồi F5 (không gửi lại); F5 nhiều lần số lượt xem không tăng, trình duyệt khác thì +1.
+ * thanhvien/3120224050_hanh/gioithieu.php - Trang cá nhân của Nguyễn Thị Bích Hạnh (Phần B - MySQL).
+ * Chức năng CSDL 1: Sổ lưu bút lưu trong bảng tv_luu_but có phân trang (5 lời nhắn/trang),
+ * kiểm tra dữ liệu + PRG, chỉ chủ trang (hanh@ued.vn) mới thấy và thực hiện được nút Xóa (gợi ý 5 Phụ lục B).
+ * Chức năng CSDL 2: Bộ đếm lượt xem theo ngày trong bảng tv_luot_xem (INSERT ... ON DUPLICATE KEY UPDATE)
+ * kèm bảng thống kê 7 ngày gần nhất.
+ * Cách thử: gửi lời nhắn trống (báo lỗi); gửi hợp lệ rồi F5; sang trang 2; đăng nhập hanh@ued.vn để xóa.
  */
 require __DIR__ . '/../../inc/config.php';
-use App\Data\KhoJsonl;
-use App\Services\BoDem;
 
+const MSSV = '3120224050';
+$goc = '../../';
 
-// Chức năng 2: bộ đếm lượt xem, mỗi PHIÊN chỉ tính một lần (tệp trong storage/ + cờ trong $_SESSION)
-$luotXem = (new BoDem(__DIR__ . '/../../storage/3120224050_luotxem.txt', 'hanh'))->tangMotLanMoiPhien();
+$stTv = db()->prepare('SELECT ho_ten, nguoi_dung_id FROM thanh_vien WHERE mssv = ?');
+$stTv->execute([MSSV]);
+$tv = $stTv->fetch() ?: ['ho_ten' => 'Nguyễn Thị Bích Hạnh', 'nguoi_dung_id' => null];
+$laChuTrang = ((int) (nguoiDung()['id'] ?? 0)) !== 0 && ((int) (nguoiDung()['id'] ?? 0)) === (int) ($tv['nguoi_dung_id'] ?? -1);
 
-// Chức năng 1: sổ lưu bút - biểu mẫu tên + lời nhắn, kiểm tra ở máy chủ, lưu storage/3120224050_luubut.jsonl
-$khoLuuBut = new KhoJsonl(__DIR__ . '/../../storage/3120224050_luubut.jsonl');
-$du = ['ten' => '', 'loinhan' => ''];
+// Chức năng CSDL 2: Bộ đếm lượt xem theo ngày (INSERT ... ON DUPLICATE KEY UPDATE, mỗi phiên tăng 1 lần)
+if (empty($_SESSION['da_dem_xem_hanh'])) {
+    db()->prepare(
+        'INSERT INTO tv_luot_xem (mssv, ngay, so_luot) VALUES (?, CURDATE(), 1)
+         ON DUPLICATE KEY UPDATE so_luot = so_luot + 1'
+    )->execute([MSSV]);
+    $_SESSION['da_dem_xem_hanh'] = true;
+}
+
+$stTongXem = db()->prepare('SELECT COALESCE(SUM(so_luot), 0) FROM tv_luot_xem WHERE mssv = ?');
+$stTongXem->execute([MSSV]);
+$tongLuotXem = (int) $stTongXem->fetchColumn();
+
+$stBayNgay = db()->prepare(
+    'SELECT ngay, so_luot FROM tv_luot_xem
+     WHERE mssv = ? ORDER BY ngay DESC LIMIT 7'
+);
+$stBayNgay->execute([MSSV]);
+$dsBayNgay = $stBayNgay->fetchAll();
+
+// Chức năng CSDL 1: Sổ lưu bút có phân trang và phân quyền chủ trang xóa lời nhắn (gợi ý 5)
+$du  = ['ten' => '', 'loi_nhan' => ''];
 $loi = [];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $du['ten'] = layChuoi($_POST, 'ten');
-    $du['loinhan'] = layChuoi($_POST, 'loinhan');
-    if (mb_strlen($du['ten']) < 2 || mb_strlen($du['ten']) > 40) {
-        $loi['ten'] = 'Tên cần từ 2 đến 40 ký tự.';
+    $xoa = filter_var($_POST['xoa'] ?? '', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    if ($xoa !== false) {
+        if ($laChuTrang) {
+            db()->prepare('DELETE FROM tv_luu_but WHERE id = ? AND mssv = ?')
+                ->execute([(int) $xoa, MSSV]);
+            datFlash('ok', 'Đã xóa lời nhắn khỏi sổ lưu bút.');
+        } else {
+            datFlash('loi', 'Chỉ chủ trang mới có quyền xóa lời nhắn.');
+        }
+        header('Location: gioithieu.php#luu-but');
+        exit;
     }
-    if (mb_strlen($du['loinhan']) < 5 || mb_strlen($du['loinhan']) > 300) {
-        $loi['loinhan'] = 'Lời nhắn cần từ 5 đến 300 ký tự.';
+
+    $du['ten']      = layChuoi($_POST, 'ten');
+    $du['loi_nhan'] = layChuoi($_POST, 'loi_nhan');
+    if ($du['loi_nhan'] === '') {
+        $du['loi_nhan'] = layChuoi($_POST, 'loinhan');
     }
+
+    if (mb_strlen($du['ten']) < 2 || mb_strlen($du['ten']) > 50) {
+        $loi['ten'] = 'Tên cần từ 2 đến 50 ký tự.';
+    }
+    if (mb_strlen($du['loi_nhan']) < 5 || mb_strlen($du['loi_nhan']) > 500) {
+        $loi['loi_nhan'] = 'Lời nhắn cần từ 5 đến 500 ký tự.';
+    }
+
     if (!$loi) {
-        $khoLuuBut->them(['thoiGian' => date('Y-m-d H:i:s'), 'ten' => $du['ten'], 'loiNhan' => $du['loinhan']]);
-        datFlash('ok', 'Cảm ơn bạn đã để lại lời nhắn!');
-        header('Location: gioithieu.php#luu-but');   // PRG
+        db()->prepare(
+            'INSERT INTO tv_luu_but (mssv, ten_khach, loi_nhan) VALUES (?, ?, ?)'
+        )->execute([MSSV, $du['ten'], $du['loi_nhan']]);
+        datFlash('ok', 'Cảm ơn bạn đã ghi lưu bút!');
+        header('Location: gioithieu.php#luu-but');
         exit;
     }
 }
-$luuBut = $khoLuuBut->moiNhat(5);       // năm lời nhắn mới nhất
 
-$goc = '../../';                      // đường dẫn từ trang này về thư mục gốc
-$tieuDe = 'Hồ sơ cá nhân | Nguyễn Thị Bích Hạnh';
-$trang = 'gioi-thieu';
-$moTa = 'Trang giới thiệu cá nhân, kỹ năng chuyên môn và thời khóa biểu của sinh viên Nguyễn Thị Bích Hạnh.';
+$stDemLb = db()->prepare('SELECT COUNT(*) FROM tv_luu_but WHERE mssv = ?');
+$stDemLb->execute([MSSV]);
+$tongLb  = (int) $stDemLb->fetchColumn();
+$soTrang = max(1, (int) ceil($tongLb / 5));
+$hienTai = filter_var($_GET['trang'] ?? 1, FILTER_VALIDATE_INT, [
+    'options' => ['min_range' => 1, 'default' => 1],
+]);
+$hienTai = min((int) $hienTai, $soTrang);
+
+$stLb = db()->prepare(
+    'SELECT id, ten_khach, loi_nhan, thoi_gian
+     FROM tv_luu_but WHERE mssv = ?
+     ORDER BY thoi_gian DESC, id DESC
+     LIMIT 5 OFFSET ?'
+);
+$stLb->execute([MSSV, ($hienTai - 1) * 5]);
+$dsLoiNhan = $stLb->fetchAll();
+
+$tieuDe    = 'Hồ sơ cá nhân | Nguyễn Thị Bích Hạnh';
+$trang     = 'gioi-thieu';
+$moTa      = 'Trang giới thiệu cá nhân, sổ lưu bút có phân trang và bộ đếm lượt xem theo ngày của Nguyễn Thị Bích Hạnh.';
 $bodyClass = '';
-$cssThem = ['css/style-hanh.css'];
-$jsThem = ['js/canhan.js'];
+$cssThem   = ['css/style-hanh.css'];
+$jsThem    = ['js/canhan.js'];
 require __DIR__ . '/../../inc/header.php';
 ?>
     <main id="noi-dung">
 <?php require __DIR__ . '/../../inc/thong-bao.php'; ?>
-                        <h1>Hồ sơ sinh viên: Nguyễn Thị Bích Hạnh</h1>
-                        <section>
-                                <h2>1. Thông tin bản thân</h2>
-                                <figure>
-                                        <img alt="Ảnh thẻ chân dung của sinh viên Nguyễn Thị Bích Hạnh" src="chan-dung-hanh.jpg"
-                                                width="200" />
-                                        <figcaption>Ảnh 1: Chân dung sinh viên</figcaption>
-                                </figure>
-                                <p><strong>Mã sinh viên:</strong> 3120224050</p>
-                                <p><strong>Lớp:</strong> 24CNTT2 — Khoa Toán - Tin, Trường Đại học Sư phạm - ĐHĐN</p>
-                                <p><strong>Vai trò trong nhóm:</strong> Thành viên, tham gia xây dựng và phát triển dự
-                                        án
-                                        JadeHub.
-                                </p>
-                        </section>
-                        <article>
-                                <h2>2. Định hướng chuyên môn và kỹ năng</h2>
-                                <p>Em định hướng phát triển theo lĩnh vực kỹ thuật phần mềm. Yêu thích việc tìm
-                                        hiểu kiến trúc mạng máy tính và phát triển các sản phẩm công nghệ .</p>
-                                <h3>Kỹ năng chính:</h3>
-                                <ul>
-                                        <li>Ngôn ngữ lập trình: HTML5, CSS3, PHP, Python, C++</li>
-                                        <li>Hệ quản trị cơ sở dữ liệu: MySQL, PostgreSQL, SQL Server</li>
-                                        <li>Công cụ làm việc: Visual Studio Code, Git/GitHub, Postman</li>
-                                </ul>
-                        </article>
-                        <section>
-                                <h2>3. Thời khóa biểu học tập tuần này</h2>
-                                <div class="khung-thoi-khoa-bieu">
-                                        <table>
-                                                <caption>Bảng 1: Lịch học các học phần trong học kỳ 1 năm học 2026 -
-                                                        2027
-                                                </caption>
-                                                <thead>
-                                                        <tr>
-                                                                <th scope="col">Thứ</th>
-                                                                <th scope="col">Buổi sáng (Tiết 1 - 6)</th>
-                                                                <th scope="col">Buổi chiều (Tiết 7 - 12)</th>
-                                                        </tr>
-                                                </thead>
-                                                <tbody>
-                                                        <tr>
-                                                                <th scope="row">Thứ Hai</th>
-                                                                <td>Nghỉ</td>
-                                                                <td>An toàn thông tin</td>
-                                                        </tr>
-                                                        <tr>
-                                                                <th scope="row">Thứ Ba</th>
-                                                                <td>Nghỉ</td>
-                                                                <td>Hệ quản trị cơ sở dữ liệu</td>
-                                                        </tr>
-                                                        <tr>
-                                                                <th scope="row">Thứ Tư</th>
-                                                                <td>nghỉ</td>
-                                                                <td>làm bài tập</td>
-                                                        </tr>
-                                                        <tr>
-                                                                <th scope="row">Thứ Năm</th>
-                                                                <td>Khai phá dữ liệu</td>
-                                                                <td>Lịch sử đảng; Công nghệ phần mềm</td>
-                                                        </tr>
-                                                        <tr>
-                                                                <th scope="row">Thứ Sáu</th>
-                                                                <td>Lập trình mạng</td>
-                                                                <td>Sinh hoạt nhóm</td>
-                                                        </tr>
-                                                        <tr>
-                                                                <th scope="row">Thứ Bảy</th>
-                                                                <td>Thiết kế và lập trình Web</td>
-                                                                <td>Học</td>
-                                                        </tr>
-                                                </tbody>
-                                        </table>
-                                </div>
-                        </section>
-        
+        <h1>Hồ sơ sinh viên: <?= e((string) $tv['ho_ten']) ?></h1>
+        <section>
+            <h2>1. Thông tin bản thân</h2>
+            <figure>
+                <img alt="Ảnh thẻ chân dung của sinh viên Nguyễn Thị Bích Hạnh" src="chan-dung-hanh.jpg" width="200">
+                <figcaption>Ảnh 1: Chân dung sinh viên</figcaption>
+            </figure>
+            <p><strong>Mã sinh viên:</strong> <?= e(MSSV) ?></p>
+            <p><strong>Lớp:</strong> 24CNTT2 — Khoa Toán - Tin, Trường Đại học Sư phạm - ĐHĐN</p>
+            <p><strong>Vai trò trong nhóm:</strong> Thành viên, phụ trách Chức năng 2 (tìm kiếm, lọc, sắp xếp, phân trang ở <code>danh-sach.php</code>) và kiểm thử 14 ca Bảng 3.</p>
+        </section>
+
+        <article>
+            <h2>2. Định hướng chuyên môn và kỹ năng</h2>
+            <p>Em định hướng phát triển theo lĩnh vực kỹ thuật phần mềm, yêu thích tìm hiểu kiến trúc mạng máy tính và xây dựng ứng dụng web với PHP &amp; MySQL.</p>
+            <ul>
+                <li>Ngôn ngữ lập trình: HTML5, CSS3, PHP 8, Python, C++</li>
+                <li>Hệ quản trị cơ sở dữ liệu: MySQL / MariaDB, PostgreSQL, SQL Server</li>
+                <li>Công cụ làm việc: Visual Studio Code, Git/GitHub, curl, REST Client</li>
+            </ul>
+        </article>
+
+        <section id="luot-xem">
+            <h2>3. Thống kê lượt xem theo ngày (bảng <code>tv_luot_xem</code>)</h2>
+            <p>Tổng lượt xem tích lũy: <strong><?= $tongLuotXem ?></strong> lượt (mỗi phiên truy cập tính 1 lần bằng <code>INSERT ... ON DUPLICATE KEY UPDATE</code>).</p>
+            <div class="khung-thoi-khoa-bieu">
+                <table>
+                    <caption>Bảng 1: Thống kê lượt xem 7 ngày gần nhất</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Ngày</th>
+                            <th scope="col">Số lượt xem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+<?php foreach ($dsBayNgay as $ng): ?>
+                        <tr>
+                            <th scope="row"><?= e((string) $ng['ngay']) ?></th>
+                            <td><strong><?= (int) $ng['so_luot'] ?></strong> lượt</td>
+                        </tr>
+<?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
         <section id="luu-but">
-            <h2>4. Sổ lưu bút</h2>
-            <p>Lượt xem trang này: <strong><?= $luotXem ?></strong> (mỗi phiên chỉ tính một lần).</p>
+            <h2>4. Sổ lưu bút có phân trang (bảng <code>tv_luu_but</code> — <?= $tongLb ?> lời nhắn)</h2>
 <?php if ($loi): ?>
-            <p class="thong-bao loi" role="alert">Vui lòng sửa các ô được báo lỗi.</p>
+            <p class="thong-bao loi" role="alert">Vui lòng kiểm tra các ô báo lỗi bên dưới.</p>
 <?php endif; ?>
-            <form method="post" action="gioithieu.php#luu-but">
+            <form method="post" action="gioithieu.php#luu-but" class="form-tham-dinh">
                 <p>
-                    <label for="lb-ten">Tên của bạn (*)</label>
-                    <input id="lb-ten" name="ten" type="text" maxlength="40" required value="<?= e($du['ten']) ?>">
+                    <label for="lb-ten">Tên của bạn (2–50 ký tự) (*)</label>
+                    <input id="lb-ten" name="ten" type="text" maxlength="50" required value="<?= e($du['ten']) ?>">
                     <small class="loi-truong"><?= e($loi['ten'] ?? '') ?></small>
                 </p>
                 <p>
-                    <label for="lb-loinhan">Lời nhắn (*)</label>
-                    <textarea id="lb-loinhan" name="loinhan" rows="3" maxlength="300" required><?= e($du['loinhan']) ?></textarea>
-                    <small class="loi-truong"><?= e($loi['loinhan'] ?? '') ?></small>
+                    <label for="lb-loinhan">Lời nhắn (5–500 ký tự) (*)</label>
+                    <textarea id="lb-loinhan" name="loi_nhan" rows="3" maxlength="500" required><?= e($du['loi_nhan']) ?></textarea>
+                    <small class="loi-truong"><?= e($loi['loi_nhan'] ?? '') ?></small>
                 </p>
                 <button type="submit">Gửi lời nhắn</button>
             </form>
-            <h3>Năm lời nhắn mới nhất</h3>
-<?php if (!$luuBut): ?>
+
+            <h3>Danh sách lời nhắn (trang <?= $hienTai ?>/<?= $soTrang ?>)</h3>
+<?php if (!$dsLoiNhan): ?>
             <p>Chưa có lời nhắn nào.</p>
 <?php else: ?>
             <ul>
-<?php foreach ($luuBut as $lb): ?>
-                <li><strong><?= e((string) ($lb['ten'] ?? '')) ?></strong> <small>(<?= e((string) ($lb['thoiGian'] ?? '')) ?>)</small><br><?= nl2br(e((string) ($lb['loiNhan'] ?? ''))) ?></li>
+<?php foreach ($dsLoiNhan as $lb): ?>
+                <li>
+                    <strong><?= e((string) $lb['ten_khach']) ?></strong>
+                    <small>(<?= e((string) $lb['thoi_gian']) ?>)</small><br>
+                    <?= nl2br(e((string) $lb['loi_nhan'])) ?>
+<?php if ($laChuTrang): ?>
+                    <form method="post" action="gioithieu.php#luu-but" style="display:inline">
+                        <input type="hidden" name="xoa" value="<?= (int) $lb['id'] ?>">
+                        <button type="submit">Xóa</button>
+                    </form>
+<?php endif; ?>
+                </li>
 <?php endforeach; ?>
             </ul>
+
+<?php if ($soTrang > 1): ?>
+            <nav class="phan-trang" aria-label="Phân trang sổ lưu bút">
+<?php for ($i = 1; $i <= $soTrang; $i++): ?>
+                <a href="?trang=<?= $i ?>#luu-but"<?= $i === $hienTai ? ' aria-current="page"' : '' ?>><?= $i ?></a>
+<?php endfor; ?>
+            </nav>
+<?php endif; ?>
 <?php endif; ?>
         </section>
     </main>

@@ -1,9 +1,9 @@
 <?php
 /**
  * inc/header.php - phần đầu dùng chung: <head>, banner, menu (đánh dấu trang đang xem),
- * số món trong giỏ, người đăng nhập hoặc nút Đăng nhập. Trang gọi gán TRƯỚC khi require:
- *   $tieuDe, $trang (khóa menu), $goc (đường dẫn về gốc, vd '../../'), tùy chọn $moTa,
- *   $bodyClass, $cssTruoc / $cssThem (mảng đường dẫn CSS). Sau header: trang tự viết <main>.
+ * số món trong giỏ (#so-mon), người đăng nhập (họ tên từ nguoiDung()), mục Đơn hàng của tôi
+ * và mục Quản trị (chỉ hiện khi vai_tro === 'quan_tri').
+ * Cách thử: đăng nhập lan@ued.vn (không thấy Quản trị) và admin@ued.vn (thấy Quản trị).
  */
 $goc ??= '';
 $trang ??= '';
@@ -13,8 +13,8 @@ $bodyClass ??= 'trang';
 $cssTruoc ??= [];
 $cssThem ??= [];
 
-// use chỉ có hiệu lực trong từng tệp nên ở đây viết tên lớp đầy đủ
 $hdGio = new App\Services\GioHang();
+$hdNd  = nguoiDung();
 $hdMenu = [
     'index'      => ['index.php', 'Trang chủ'],
     'danh-sach'  => ['danh-sach.php', 'Danh mục ngọc'],
@@ -38,7 +38,7 @@ $hdMenu = [
     <link rel="stylesheet" href="<?= e($hdCss) ?>">
 <?php endforeach; ?>
 </head>
-<body<?= $bodyClass !== '' ? ' class="' . e($bodyClass) . '"' : '' ?>>
+<body<?= $bodyClass !== '' ? ' class="' . e($bodyClass) . '"' : '' ?> data-goc="<?= e($goc) ?>">
     <a class="bo-qua" href="#noi-dung">Bỏ qua, tới nội dung chính</a>
     <header>
         <p><strong>JadeHub</strong> — Minh bạch nguồn gốc &amp; Thẩm định ngọc quý</p>
@@ -50,14 +50,18 @@ $hdMenu = [
             </ul>
         </nav>
         <p class="tom-tat-yeu-thich">
-            <a href="<?= e($goc) ?>gio-hang.php">Giỏ hàng: <span data-dem-gio><?= $hdGio->soMon() ?></span></a>
+            <a href="<?= e($goc) ?>gio-hang.php">Giỏ hàng: <span id="so-mon" data-dem-gio><?= $hdGio->soMon() ?></span></a>
             · <a href="<?= e($goc) ?>danh-sach.php">Yêu thích: <span data-dem-yeu-thich="">0</span></a>
-<?php if (isset($_SESSION['user'])): ?>
+<?php if ($hdNd !== null): ?>
+            · <a href="<?= e($goc) ?>don-hang.php">Đơn hàng của tôi</a>
+<?php if (($hdNd['vai_tro'] ?? '') === 'quan_tri'): ?>
             · <a href="<?= e($goc) ?>quan-tri.php">Quản trị</a>
-            · <span class="ten-nguoi-dung">Xin chào, <?= e((string) $_SESSION['user']) ?></span>
+<?php endif; ?>
+            · <span class="ten-nguoi-dung">Xin chào, <strong><?= e((string) $hdNd['ho_ten']) ?></strong></span>
             · <a href="<?= e($goc) ?>dang-xuat.php">Đăng xuất</a>
 <?php else: ?>
             · <a href="<?= e($goc) ?>dang-nhap.php">Đăng nhập</a>
+            · <a href="<?= e($goc) ?>dang-ky.php">Đăng ký</a>
 <?php endif; ?>
         </p>
     </header>

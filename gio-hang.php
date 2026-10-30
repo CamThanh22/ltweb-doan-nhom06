@@ -1,38 +1,44 @@
 <?php
 /**
  * gio-hang.php - Giỏ hàng lưu trong session (lớp GioHang bọc $_SESSION['gio'] = [id => số lượng]).
- * POST hanhdong = them | capnhat | xoa | xoahet. Kiểm tra: id phải có trong dữ liệu, số lượng 1..99
- * (filter_var min_range/max_range); GIÁ lấy từ KhoSanPham, không lấy từ form. Thành công -> PRG.
- * Cách thử: thêm 2 sản phẩm, đổi số lượng, xóa một mục; thử sl=0, -3, 1000, id lạ bằng curl (xem tests/).
+ * Lấy toàn bộ sản phẩm trong giỏ bằng một câu WHERE id IN (?, ...) qua KhoSanPham(db()).
+ * Kiểm tra tồn kho và số lượng 1..99; giá luôn lấy từ CSDL. Có biểu mẫu POST tới dat-hang.php.
+ * Cách thử: thêm 2 sản phẩm, đổi số lượng, xóa một mục; bấm Đặt hàng.
  */
 require __DIR__ . '/inc/config.php';
 
 use App\Data\KhoSanPham;
 use App\Services\GioHang;
 
-$kho = new KhoSanPham(__DIR__ . '/data/san-pham.json');
+$kho = new KhoSanPham(db());
 $gio = new GioHang();
 $loi = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $hanhDong = layChuoi($_POST, 'hanhdong');
+    $hanhDong = layChuoi($_POST, 'hanhdong') ?: 'them';
     $id = GioHang::idHopLe($_POST['id'] ?? null);
     $sl = GioHang::soLuongHopLe($_POST['sl'] ?? null);
 
     switch ($hanhDong) {
         case 'them':
         case 'capnhat':
-            if ($id === null || $kho->timTheoId($id) === null) {
+            $sp = $id !== null ? $kho->timTheoId($id) : null;
+            if ($sp === null) {
                 $loi = 'Sản phẩm không tồn tại, giỏ hàng được giữ nguyên.';
             } elseif ($sl === null) {
                 $loi = 'Số lượng phải là số nguyên từ 1 đến ' . GioHang::SL_TOI_DA . ', giỏ hàng được giữ nguyên.';
-            } elseif ($hanhDong === 'them') {
-                $gio->them($id, $sl);
-                datFlash('ok', 'Đã thêm sản phẩm vào giỏ hàng.');
-            } elseif ($gio->capNhat($id, $sl)) {
-                datFlash('ok', 'Đã cập nhật số lượng.');
             } else {
-                $loi = 'Sản phẩm này không có trong giỏ.';
+                $slMoi = $hanhDong === 'them' ? (($gio->tatCa()[$id] ?? 0) + $sl) : $sl;
+                if ($slMoi > $sp->tonKho) {
+                    $loi = "Sản phẩm “{$sp->ten}” chỉ còn {$sp->tonKho} món trong kho.";
+                } elseif ($hanhDong === 'them') {
+                    $gio->them($id, $sl);
+                    datFlash('ok', 'Đã thêm sản phẩm vào giỏ hàng.');
+                } elseif ($gio->capNhat($id, $sl)) {
+                    datFlash('ok', 'Đã cập nhật số lượng.');
+                } else {
+                    $loi = 'Sản phẩm này không có trong giỏ.';
+                }
             }
             break;
         case 'xoa':
@@ -51,17 +57,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($loi === '') {
-        header('Location: gio-hang.php');          // PRG: F5 không gửi lại thao tác
+        header('Location: gio-hang.php');
         exit;
     }
 }
 
 $dong = $gio->chiTiet($kho);
 $tong = $gio->tongTien($kho);
+$nd   = nguoiDung();
 
 $tieuDe = 'Giỏ hàng';
-$trang = 'gio-hang';
-$moTa = 'Giỏ hàng JadeHub: xem, đổi số lượng và xóa sản phẩm ngọc quý đã chọn.';
+$trang  = 'gio-hang';
+$moTa   = 'Giỏ hàng JadeHub: xem, đổi số lượng, xóa sản phẩm và đặt hàng.';
 require __DIR__ . '/inc/header.php';
 ?>
     <main id="noi-dung">
@@ -77,10 +84,10 @@ require __DIR__ . '/inc/header.php';
         <ul class="ds-gio">
 <?php foreach ($dong as $d): $sp = $d['sp']; ?>
             <li class="dong-gio">
-                <img src="images/<?= e($sp->anh) ?>" alt="" width="80" height="60" loading="lazy">
+                <img src="<?= e($sp->duongDanAnh()) ?>" alt="" width="80" height="60" loading="lazy">
                 <div class="thong-tin-dong">
                     <h2><a href="chi-tiet.php?id=<?= $sp->id ?>"><?= e($sp->ten) ?></a></h2>
-                    <p>Đơn giá: <?= e(vnd($sp->gia)) ?></p>
+                    <p>Đơn giá: <?= e(vnd($sp->gia)) ?> · Tồn kho: <?= $sp->tonKho ?></p>
                     <form class="form-gio" method="post" action="gio-hang.php">
                         <input type="hidden" name="hanhdong" value="capnhat">
                         <input type="hidden" name="id" value="<?= $sp->id ?>">
@@ -100,11 +107,26 @@ require __DIR__ . '/inc/header.php';
         </ul>
 
         <p class="tong-tien">Số món: <strong><?= $gio->soMon() ?></strong> · Tổng tiền: <strong><?= e(vnd($tong)) ?></strong></p>
+
+        <section class="khu-dat-hang">
+            <h2>Đặt mua các sản phẩm trong giỏ</h2>
+<?php if ($nd === null): ?>
+            <p>Bạn cần <a href="dang-nhap.php"><strong>Đăng nhập</strong></a> hoặc <a href="dang-ky.php"><strong>Đăng ký tài khoản</strong></a> để đặt hàng.</p>
+<?php else: ?>
+            <form class="form-tham-dinh" method="post" action="dat-hang.php">
+                <p>
+                    <label for="ghi-chu-don">Ghi chú giao hàng / yêu cầu chứng thư (không bắt buộc):</label>
+                    <input id="ghi-chu-don" name="ghi_chu" type="text" maxlength="500" placeholder="Ví dụ: Giao giờ hành chính kèm hộp nhung và chứng thư gốc">
+                </p>
+                <p><button type="submit" class="nut-chinh">Xác nhận đặt hàng (<?= e(vnd($tong)) ?>)</button></p>
+            </form>
+<?php endif; ?>
+        </section>
+
         <form method="post" action="gio-hang.php">
             <input type="hidden" name="hanhdong" value="xoahet">
             <button type="submit" class="nut-phu">Xóa hết giỏ hàng</button>
         </form>
-        <p>Để đặt mua hoặc thẩm định, hãy <a href="lien-he.php">gửi yêu cầu ở trang Liên hệ</a>.</p>
 <?php endif; ?>
     </main>
 <?php require __DIR__ . '/inc/footer.php'; ?>

@@ -1,0 +1,51 @@
+# api.http — mở bằng VS Code (extension REST Client), bấm "Send Request"
+# trên từng request, từ trên xuống: giỏ hàng dùng chung cookie phiên (Gợi ý 6, Phụ lục B)
+@goc = http://localhost:8000
+
+### 1. Tìm kiếm sản phẩm theo từ khóa → 200 {"du_lieu": [...]}
+GET {{goc}}/api/san-pham.php?q=nhan
+
+### 2. Xem chi tiết một sản phẩm hợp lệ → 200 {"id": 1, ...}
+GET {{goc}}/api/san-pham.php?id=1
+
+### 3. Sản phẩm không tồn tại → 404 {"loi": "Không tìm thấy sản phẩm"}
+GET {{goc}}/api/san-pham.php?id=999999
+
+### 4. Tham số id sai kiểu → 400 {"loi": "Tham số id không hợp lệ"}
+GET {{goc}}/api/san-pham.php?id=abc
+
+### 5. Xem giỏ hàng hiện tại → 200 {"gio": {...}, "so_mon": ...}
+GET {{goc}}/api/gio-hang.php
+
+### 6. Thêm vào giỏ hợp lệ → 200 {"so_mon": 2}
+POST {{goc}}/api/gio-hang.php
+Content-Type: application/json
+
+{"id": 1, "sl": 2}
+
+### 7. Thân không phải JSON (Bảng 3, ca 12) → 400 {"loi": "Thân request phải là JSON"}
+POST {{goc}}/api/gio-hang.php
+Content-Type: application/json
+
+{id: 1}
+
+### 8. Số lượng âm sl = -3 (Bảng 3, ca 12) → 422 {"loi": "id hoặc sl không hợp lệ"}
+POST {{goc}}/api/gio-hang.php
+Content-Type: application/json
+
+{"id": 1, "sl": -3}
+
+### 9. Sản phẩm id không có trong CSDL (Bảng 3, ca 12) → 404 {"loi": "Không có sản phẩm này"}
+POST {{goc}}/api/gio-hang.php
+Content-Type: application/json
+
+{"id": 999999, "sl": 1}
+
+### 10. Số lượng vượt tồn kho (Bảng 3, ca 12) → 422 {"loi": "Chỉ còn ... sản phẩm trong kho"}
+POST {{goc}}/api/gio-hang.php
+Content-Type: application/json
+
+{"id": 1, "sl": 50}
+
+### 11. Sai phương thức DELETE (Bảng 3, ca 12) → 405 Method Not Allowed, header Allow: GET, POST
+DELETE {{goc}}/api/gio-hang.php

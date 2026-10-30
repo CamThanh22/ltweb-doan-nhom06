@@ -2,10 +2,11 @@
 /**
  * inc/ham.php - Hàm tiện ích dùng chung, được inc/config.php nạp sớm.
  * e(): thoát HTML (mọi dữ liệu động in ra HTML đều qua hàm này); vnd(): định dạng tiền.
- * boDau(): bỏ dấu tiếng Việt để tìm kiếm; layChuoi(): đọc ô nhập an toàn từ $_GET/$_POST.
+ * traJson(): trả phản hồi JSON kèm mã HTTP cho REST API (slide 48).
  * datFlash()/layFlash(): thông báo hiện đúng một lần qua $_SESSION.
- * Cách thử: mở bất kỳ trang nào; chạy php tests/kiem-thu.php để thử riêng các hàm này.
+ * Cách thử: mở bất kỳ trang nào; gọi api/san-pham.php?q=nhan để kiểm tra traJson().
  */
+declare(strict_types=1);
 
 /** Thoát ký tự đặc biệt của HTML (kể cả dấu nháy) để chống XSS. */
 function e(?string $s): string
@@ -19,9 +20,19 @@ function vnd(int|float $so): string
     return number_format((float) $so, 0, ',', '.') . ' VNĐ';
 }
 
+/** Trả phản hồi JSON với mã trạng thái HTTP và kết thúc script (slide 48). */
+function traJson(mixed $duLieu, int $ma = 200): never
+{
+    if (!headers_sent()) {
+        http_response_code($ma);
+        header('Content-Type: application/json; charset=utf-8');
+    }
+    echo json_encode($duLieu, JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 /**
  * Bỏ dấu tiếng Việt và hạ chữ thường: "Nhẫn Phỉ Thúy" -> "nhan phi thuy".
- * Dùng để so khớp từ khóa không phân biệt dấu (kiểu mb_stripos).
  */
 function boDau(string $s): string
 {
@@ -45,7 +56,7 @@ function boDau(string $s): string
     if (class_exists('Normalizer')) {
         $chuan = Normalizer::normalize($s, Normalizer::FORM_C);
         if ($chuan !== false) {
-            $s = $chuan; // gộp dấu rời về dạng dựng sẵn để strtr khớp
+            $s = $chuan;
         }
     }
     return strtr(mb_strtolower($s, 'UTF-8'), $bang);
@@ -53,7 +64,6 @@ function boDau(string $s): string
 
 /**
  * Đọc một ô dạng chuỗi từ $_GET/$_POST: bỏ khoảng trắng hai đầu và ký tự điều khiển.
- * Nếu ô thiếu hoặc bị gửi dạng mảng (?q[]=x) thì trả về '' thay vì gây TypeError.
  */
 function layChuoi(array $nguon, string $khoa): string
 {
@@ -76,5 +86,8 @@ function layFlash(): ?array
 {
     $f = $_SESSION['flash'] ?? null;
     unset($_SESSION['flash']);
+    if (is_string($f) && $f !== '') {
+        return ['loai' => 'ok', 'nd' => $f];
+    }
     return is_array($f) && isset($f['loai'], $f['nd']) ? $f : null;
 }

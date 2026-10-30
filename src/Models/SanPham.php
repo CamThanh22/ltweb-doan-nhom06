@@ -1,33 +1,29 @@
 <?php
 /**
- * src/Models/SanPham.php - lớp thực thể: một viên ngọc/sản phẩm (thuộc tính readonly).
- * tuMang() tạo đối tượng từ một mục của data/san-pham.json và tự suy ra danh mục lọc.
- * Cách thử: php tests/kiem-thu.php (kiểm tra tuMang với dữ liệu thiếu trường).
+ * src/Models/SanPham.php - lớp thực thể: một viên ngọc/sản phẩm từ bảng san_pham (kèm JOIN danh_muc).
+ * Cài đặt JsonSerializable để REST API trả JSON chỉ gồm các trường công khai, không lộ trường nội bộ (slide 48).
+ * Cách thử: json_encode($kho->timTheoId(1), JSON_UNESCAPED_UNICODE) -> chuỗi JSON gọn, an toàn.
  */
 declare(strict_types=1);
 
 namespace App\Models;
 
 use InvalidArgumentException;
+use JsonSerializable;
 
-final class SanPham
+final class SanPham implements JsonSerializable
 {
-    /** Danh mục dùng cho bộ lọc: khóa (an toàn trên URL) => nhãn hiển thị. */
-    public const DANH_MUC = [
-        'phi-thuy'  => 'Phỉ thúy',
-        'cam-thach' => 'Cẩm thạch',
-        'ngoc-bich' => 'Ngọc bích Hòa Điền',
-        'khac'      => 'Loại khác',
-    ];
-
     public function __construct(
         public readonly int $id,
+        public readonly int $danhMucId,
         public readonly string $ma,
         public readonly string $ten,
         public readonly string $loai,
-        public readonly string $danhMuc,
+        public readonly string $danhMucSlug,
+        public readonly string $tenDanhMuc,
         public readonly string $anh,
         public readonly int $gia,
+        public readonly int $tonKho,
         public readonly string $xuatXu,
         public readonly string $kiemDinh,
         public readonly string $moTa,
@@ -36,53 +32,77 @@ final class SanPham
         public readonly string $chietSuat,
         public readonly string $tyTrong,
         public readonly ?string $anhChungThu,
+        public readonly string $ngayTao = '',
     ) {
     }
 
-    /** Tạo đối tượng từ một phần tử của tệp JSON (id phải là số nguyên dương). */
+    /** Tạo đối tượng từ một dòng kết quả truy vấn PDO (bảng san_pham JOIN danh_muc). */
     public static function tuMang(array $d): self
     {
         $id = filter_var($d['id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
         if ($id === false) {
-            throw new InvalidArgumentException('Mục dữ liệu sản phẩm thiếu id hợp lệ.');
+            throw new InvalidArgumentException('Dòng dữ liệu sản phẩm thiếu id hợp lệ.');
         }
-        $loai = (string) ($d['loai'] ?? '');
-        $chungThu = $d['anhChungThu'] ?? null;
+        $dmId = (int) ($d['danh_muc_id'] ?? 1);
+        $chungThu = $d['anh_chung_thu'] ?? ($d['anhChungThu'] ?? null);
+        $anh = (string) ($d['anh'] ?? '');
 
         return new self(
             id: $id,
-            ma: (string) ($d['ma'] ?? ''),
+            danhMucId: $dmId,
+            ma: (string) ($d['ma'] ?? ('JADE-' . str_pad((string) $id, 2, '0', STR_PAD_LEFT))),
             ten: (string) ($d['ten'] ?? ''),
-            loai: $loai,
-            danhMuc: self::suyDanhMuc($loai),
-            anh: (string) ($d['anh'] ?? ''),
-            gia: (int) round((float) ($d['gia'] ?? 0)),
-            xuatXu: (string) ($d['xuatXu'] ?? ''),
-            kiemDinh: (string) ($d['kiemDinh'] ?? ''),
-            moTa: (string) ($d['moTa'] ?? ''),
-            trongLuong: (string) ($d['trongLuong'] ?? ''),
-            doCung: (string) ($d['doCung'] ?? ''),
-            chietSuat: (string) ($d['chietSuat'] ?? ''),
-            tyTrong: (string) ($d['tyTrong'] ?? ''),
+            loai: (string) ($d['loai'] ?? 'Ngọc tự nhiên'),
+            danhMucSlug: (string) ($d['danh_muc_slug'] ?? 'phi-thuy'),
+            tenDanhMuc: (string) ($d['ten_danh_muc'] ?? 'Ngọc quý'),
+            anh: $anh !== '' ? $anh : 'nhan-phi-thuy-01.jpg',
+            gia: (int) ($d['gia'] ?? 0),
+            tonKho: max(0, (int) ($d['ton_kho'] ?? 0)),
+            xuatXu: (string) ($d['xuat_xu'] ?? ($d['xuatXu'] ?? 'Myanmar')),
+            kiemDinh: (string) ($d['kiem_dinh'] ?? ($d['kiemDinh'] ?? 'Đã thẩm định')),
+            moTa: (string) ($d['mo_ta'] ?? ($d['moTa'] ?? '')),
+            trongLuong: (string) ($d['trong_luong'] ?? ($d['trongLuong'] ?? '—')),
+            doCung: (string) ($d['do_cung'] ?? ($d['doCung'] ?? '6.5 - 7.0')),
+            chietSuat: (string) ($d['chiet_suat'] ?? ($d['chietSuat'] ?? '1.66')),
+            tyTrong: (string) ($d['ty_trong'] ?? ($d['tyTrong'] ?? '3.33 g/cm³')),
             anhChungThu: is_string($chungThu) && $chungThu !== '' ? $chungThu : null,
+            ngayTao: (string) ($d['ngay_tao'] ?? ''),
         );
     }
 
-    /** Nhãn danh mục để hiển thị. */
     public function tenDanhMuc(): string
     {
-        return self::DANH_MUC[$this->danhMuc] ?? self::DANH_MUC['khac'];
+        return $this->tenDanhMuc;
     }
 
-    /** Suy danh mục từ trường "loai" của JSON (không đổi dữ liệu gốc của Bài tập 4). */
-    private static function suyDanhMuc(string $loai): string
+    public function conHang(): bool
     {
-        $l = \boDau($loai);
-        return match (true) {
-            str_contains($l, 'phi thuy') => 'phi-thuy',
-            str_contains($l, 'cam thach') => 'cam-thach',
-            str_contains($l, 'ngoc bich'), str_contains($l, 'nephrite') => 'ngoc-bich',
-            default => 'khac',
-        };
+        return $this->tonKho > 0;
+    }
+
+    /** Đường dẫn ảnh sản phẩm (trong uploads/ nếu là ảnh tải lên, hoặc images/ nếu là ảnh mẫu). */
+    public function duongDanAnh(string $goc = ''): string
+    {
+        if (preg_match('/^[a-f0-9]{32}\.(jpg|png|webp)\z/', $this->anh) === 1) {
+            return $goc . 'uploads/' . $this->anh;
+        }
+        return $goc . 'images/' . $this->anh;
+    }
+
+    /** Chỉ trả các trường công khai cho REST API (slide 48). */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id'         => $this->id,
+            'ma'         => $this->ma,
+            'ten'        => $this->ten,
+            'danh_muc'   => $this->tenDanhMuc,
+            'loai'       => $this->loai,
+            'xuat_xu'    => $this->xuatXu,
+            'gia'        => $this->gia,
+            'ton_kho'    => $this->tonKho,
+            'con_hang'   => $this->conHang(),
+            'anh'        => $this->duongDanAnh(),
+        ];
     }
 }

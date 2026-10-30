@@ -1,9 +1,9 @@
 <?php
 /**
- * lien-he.php - Biểu mẫu liên hệ / đăng ký thẩm định, kiểm tra Ở MÁY CHỦ (HTML + JS chỉ là lớp thứ nhất).
- * $du giữ giá trị đã nhập để điền lại, $loi gom lỗi theo tên ô. Ảnh đính kèm (không bắt buộc, <= 2 MB)
- * kiểm tra kiểu thật bằng finfo, đặt tên ngẫu nhiên, lưu uploads/. Dữ liệu lưu storage/lien-he.jsonl, rồi PRG.
- * Cách thử: gửi ô trống / email "lan@ued" / ảnh giả; gửi hợp lệ rồi F5 (chỉ thêm một dòng, thông báo hiện một lần).
+ * lien-he.php - Biểu mẫu liên hệ / đăng ký thẩm định, kiểm tra ở máy chủ và lưu vào bảng lien_he (MySQL)
+ * qua lớp KhoLienHe(db()). Ảnh đính kèm (<= 2 MB) kiểm tra kiểu thật bằng finfo, lưu uploads/.
+ * Nhờ lớp truy cập dữ liệu KhoLienHe, trang này chỉ đổi đúng dòng khởi tạo new KhoLienHe(db()).
+ * Cách thử: gửi ô trống / email sai / ảnh giả; gửi hợp lệ rồi F5 (PRG).
  */
 require __DIR__ . '/inc/config.php';
 
@@ -22,7 +22,6 @@ $du = ['hoten' => '', 'email' => '', 'sdt' => '', 'loaingoc' => 'phithuy',
 $loi = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Gửi quá post_max_size thì PHP bỏ trống cả $_POST lẫn $_FILES: báo lỗi rõ ràng thay vì hiện form như mới
     $kichThuocGui = (int) ($_SERVER['CONTENT_LENGTH'] ?? 0);
     $gioiHan = (int) ini_get('post_max_size');
     $donVi = strtoupper(substr(trim((string) ini_get('post_max_size')), -1));
@@ -37,7 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $du['camket'] = layChuoi($_POST, 'camket');
     $tep = isset($_FILES['anhngoc']) && is_array($_FILES['anhngoc']) ? $_FILES['anhngoc'] : null;
 
-    // Họ tên: 4-50 ký tự, chỉ gồm chữ cái (có dấu), khoảng trắng, dấu chấm, gạch nối, nháy đơn
     if ($du['hoten'] === '') {
         $loi['hoten'] = 'Vui lòng nhập họ và tên.';
     } elseif (mb_strlen($du['hoten']) < 4 || mb_strlen($du['hoten']) > 50) {
@@ -68,7 +66,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $loi['soluong'] = 'Số lượng mẫu phải là số nguyên từ 1 đến 20.';
     }
 
-    // Ngày hẹn: đúng định dạng YYYY-MM-DD, là ngày có thật, từ hôm nay đến 1 năm tới
     $ngay = DateTimeImmutable::createFromFormat('!Y-m-d', $du['ngayhen']);
     if ($du['ngayhen'] === '') {
         $loi['ngayhen'] = 'Vui lòng chọn ngày dự kiến mang mẫu đến.';
@@ -94,12 +91,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!$loi) {
-        // Chỉ khi MỌI ô hợp lệ mới chuyển ảnh vào uploads/ (ảnh lỗi hoặc ô khác lỗi thì không để lại tệp)
         $tenAnh = TaiAnh::coTep($tep) ? (new TaiAnh(__DIR__ . '/uploads'))->luu($tep) : null;
 
-        $kho = new KhoLienHe(__DIR__ . '/storage/lien-he.jsonl');
+        $kho = new KhoLienHe(db());
         $kho->them([
-            'thoiGian' => date('Y-m-d H:i:s'),
             'hoTen'    => $du['hoten'],
             'email'    => $du['email'],
             'sdt'      => $du['sdt'],
@@ -107,10 +102,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'soLuong'  => $soLuong,
             'ngayHen'  => $du['ngayhen'],
             'ghiChu'   => $du['ghichu'],
-            'anh'      => $tenAnh,           // tên tệp trong uploads/ hoặc null
+            'anh'      => $tenAnh,
         ]);
         datFlash('ok', 'Đã gửi liên hệ, JadeHub cảm ơn bạn và sẽ phản hồi sớm!');
-        header('Location: lien-he.php');     // PRG: F5 không gửi lại
+        header('Location: lien-he.php');
         exit;
     }
 }
@@ -121,7 +116,6 @@ $moTa = 'Biểu mẫu liên hệ, đặt lịch gửi mẫu kiểm định ngọ
 $jsThem = ['js/trang-lien-he.js'];
 require __DIR__ . '/inc/header.php';
 
-/** In thông báo lỗi dưới một ô (khóa = name của ô). */
 function loiO(array $loi, string $khoa, string $idO): string
 {
     return '<small class="loi-truong" id="loi-' . e($idO) . '" data-loi="' . e($idO) . '">' . e($loi[$khoa] ?? '') . '</small>';

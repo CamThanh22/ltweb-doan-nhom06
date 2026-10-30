@@ -1087,3 +1087,80 @@ main img {
         grid-column: 1 / -1;
     }
 }
+
+/* ==================================================
+   12. CHƯƠNG 6 - PHÂN TRANG, TÌM KIẾM TỨC THỜI, ĐƠN HÀNG
+   ================================================== */
+
+.phan-trang {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 20px 0;
+}
+
+.phan-trang a {
+    display: inline-block;
+    padding: 8px 13px;
+    color: var(--mau-chinh-dam);
+    background-color: var(--mau-trang);
+    border: 1px solid var(--mau-chinh);
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.phan-trang a[aria-current="page"],
+.phan-trang a:hover {
+    color: var(--mau-trang);
+    background-color: var(--mau-chinh-dam);
+    text-decoration: none;
+}
+
+.khung-o-tim {
+    position: relative;
+    width: 100%;
+}
+
+.ds-goi-y {
+    margin: 4px 0 0;
+    padding: 0;
+    list-style: none;
+    background-color: var(--mau-trang);
+    border: 1px solid var(--mau-vien);
+    border-radius: 8px;
+}
+
+.ds-goi-y:empty {
+    display: none;
+}
+
+.ds-goi-y li {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--mau-vien);
+}
+
+.ds-goi-y li:last-child {
+    border-bottom: 0;
+}
+
+.vien-ngoc-tieu-bieu,
+.khu-dat-hang,
+.chi-tiet-don-hang {
+    margin-top: var(--khoang-lon);
+    padding: var(--khoang-vua);
+    background-color: var(--mau-trang);
+    border: 1px solid var(--mau-vien);
+    border-radius: var(--bo-goc);
+}
+
+.an-man-hinh {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}

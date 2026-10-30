@@ -1,69 +1,65 @@
 # JadeHub – Sàn giao dịch và thẩm định ngọc quý (Nhóm 06)
 
-Bài tập nhóm số 5 – Chương 5: website động bằng **PHP thuần** (không framework, không CMS).
-Học phần Thiết kế và Lập trình Web – Khoa Toán – Tin, Trường ĐH Sư phạm – ĐHĐN.
+Bài tập thực hành nhóm số 6 – Chương 6: **PHP và cơ sở dữ liệu MySQL (PDO)**.
+Học phần Thiết kế và Lập trình Web – Khoa Toán – Tin, Trường Đại học Sư phạm – Đại học Đà Nẵng.
 
-- Bản tĩnh của Bài tập nhóm 4 được giữ ở thẻ Git `btn4`.
-- Dữ liệu sản phẩm vẫn lấy từ `data/san-pham.json` (Chương 6 sẽ chuyển sang MySQL, chỉ cần viết lại lớp `src/Data/KhoSanPham.php` và `KhoLienHe.php`).
-
-## Yêu cầu môi trường
-- PHP >= 8.1 với các extension mặc định: `mbstring`, `fileinfo` (upload), `json`; `intl` không bắt buộc.
-- Composer (getcomposer.org).
+- Bản nộp của Bài tập nhóm số 5 được gắn thẻ Git `btn5`.
+- Toàn bộ dữ liệu sản phẩm, danh mục, người dùng, đơn hàng, chi tiết đơn, liên hệ và dữ liệu trang cá nhân của 5 thành viên được lưu trong CSDL MySQL `ltweb_nhom06` (`utf8mb4_unicode_ci`).
 
 ## Cài đặt và chạy
-```bash
-composer install                  # tạo vendor/ (autoload PSR-4: App\ -> src/)
-php -S localhost:8000             # chạy tại thư mục gốc của kho
-# hoặc, nên dùng khi chạy bằng php -S vì máy chủ này bỏ qua .htaccess, chặn truy cập storage/, logs/, inc/...:
-php -S localhost:8000 router.php
-```
-Mở http://localhost:8000/. Có thể chép cả thư mục vào `htdocs` của XAMPP và mở
-http://localhost/ltweb-doan-nhom06/ (mọi đường dẫn đều tương đối; `.htaccess` trong `storage/` và `logs/` chặn truy cập qua URL).
+Cần: PHP ≥ 8.1 (bật `pdo_mysql`, `mbstring`, `fileinfo`), MySQL hoặc MariaDB (XAMPP / Laragon), Composer.
 
-> Nếu quên `composer install`, `inc/config.php` vẫn tự nạp lớp `App\` theo PSR-4 nên site vẫn chạy.
-> Thư mục `storage/`, `logs/`, `uploads/` cần ghi được; dữ liệu phát sinh khi chạy không được commit (`.gitignore`).
+1. Cài đặt autoload PSR-4 của Composer:
+   ```bash
+   composer install
+   ```
+2. Tạo CSDL `ltweb_nhom06` (xóa và tạo lại từ đầu): mở **phpMyAdmin** → **Import** `database/schema.sql`, rồi **Import** `database/seed.sql`; hoặc chạy lệnh trong Git Bash / Terminal (`mysql` của XAMPP ở `C:\xampp\mysql\bin`):
+   ```bash
+   mysql -u root < database/schema.sql
+   mysql -u root ltweb_nhom06 < database/seed.sql
+   ```
+3. Chạy máy chủ tích hợp của PHP tại thư mục gốc của kho:
+   ```bash
+   php -S localhost:8000
+   # hoặc kèm router chặn truy cập trực tiếp database/, inc/, src/, logs/, storage/:
+   php -S localhost:8000 router.php
+   ```
+   Sau đó mở `http://localhost:8000` (hoặc chép thư mục vào `htdocs` của XAMPP và mở `http://localhost/ltweb-doan-nhom06/`).
 
-## Tài khoản thử trang quản trị
-| Tên đăng nhập | Mật khẩu |
-|---|---|
-| `admin` | `Jade@2026` |
-| `giangvien` | `Quantri@2026` |
-
-Chỉ dùng cho website của nhóm; mật khẩu lưu dạng băm bcrypt trong `inc/tai-khoan.php`.
-
-## Chức năng – URL – Tệp PHP
-| Chức năng | URL | Tệp PHP chính |
+## Tài khoản thử (mật khẩu chung: `matkhau123`)
+| Email đăng nhập | Vai trò (`vai_tro`) | Ghi chú |
 |---|---|---|
-| Khung trang dùng chung, 404, 500 | mọi trang | `inc/config.php`, `inc/header.php`, `inc/footer.php`, `404.php`, `500.php` |
-| Danh sách: tìm, lọc, sắp xếp | `/danh-sach.php?q=nhan&dm=phi-thuy&sx=gia-tang` | `danh-sach.php`, `src/Data/KhoSanPham.php` |
-| Chi tiết, đã xem gần đây | `/chi-tiet.php?id=1`, khối ở `/index.php` | `chi-tiet.php`, `index.php`, `src/Services/DaXem.php` |
-| Liên hệ (kiểm tra, upload, lưu) | `/lien-he.php` | `lien-he.php`, `src/Data/KhoLienHe.php`, `src/Services/TaiAnh.php` |
-| Giỏ hàng (session) | `/gio-hang.php` | `gio-hang.php`, `src/Services/GioHang.php` |
-| Đăng nhập, quản trị, đăng xuất | `/dang-nhap.php`, `/quan-tri.php`, `/dang-xuat.php` | `dang-nhap.php`, `quan-tri.php`, `dang-xuat.php`, `inc/bao-ve.php`, `inc/tai-khoan.php` |
-| Giới thiệu nhóm | `/gioi-thieu.php` | `gioi-thieu.php` |
-| Trang cá nhân + 2 chức năng PHP mỗi người | `/thanhvien/<MSSV>_<ten>/gioithieu.php` | xem bảng dưới |
+| `admin@ued.vn` | `quan_tri` | Quản trị viên — vào được `quan-tri.php`, thêm/sửa/xóa sản phẩm, xem mọi đơn hàng và đổi trạng thái |
+| `lan@ued.vn` | `khach_hang` | Khách hàng thử 1 — đã có đơn hàng `#1` và `#3` |
+| `an@ued.vn` | `khach_hang` | Khách hàng thử 2 — đã có đơn hàng `#2` |
+| `thanh@ued.vn` | `quan_tri` | Chủ trang cá nhân Trần Thị Cẩm Thanh (`3120224133`) |
+| `hanh@ued.vn` | `khach_hang` | Chủ trang cá nhân Nguyễn Thị Bích Hạnh (`3120224050`) — có đơn hàng `#4` |
+| `hong@ued.vn` | `khach_hang` | Chủ trang cá nhân Nguyễn Nhật Ánh Hồng (`3120224063`) |
+| `trinh@ued.vn` | `khach_hang` | Chủ trang cá nhân Huỳnh Trần Phương Trinh (`3120124031`) |
+| `bouakeo@ued.vn` | `khach_hang` | Chủ trang cá nhân Ladisa Bouakeo (`3120124038`) |
 
-| Thành viên | Hai chức năng PHP trên trang cá nhân |
-|---|---|
-| Trần Thị Cẩm Thanh (3120224133) | Giao diện sáng/tối bằng cookie; máy tính điểm học phần |
-| Nguyễn Thị Bích Hạnh (3120224050) | Sổ lưu bút (jsonl, PRG); bộ đếm lượt xem mỗi phiên một lần |
-| Nguyễn Nhật Ánh Hồng (3120224063) | Ảnh đại diện tải lên an toàn; thời khóa biểu lọc theo thứ |
-| Huỳnh Trần Phương Trinh (3120124031) | Kỹ năng lọc theo nhóm; việc cần làm lưu trong session |
-| Ladisa Bouakeo (3120124038) | Nhớ tên khách bằng cookie; đánh giá hồ sơ 1–5 sao |
+## Chức năng – URL – Tệp PHP (Bảng 1)
+| TT | Chức năng | URL chính | Tệp PHP | Người phụ trách |
+|---|---|---|---|---|
+| 1 | Đọc dữ liệu từ MySQL: trang chủ (mục mới, đã xem gần đây), chi tiết kèm tên danh mục & 4 mục cùng danh mục, giỏ hàng (`WHERE id IN (...)`), liên hệ lưu bảng `lien_he` | `/index.php`, `/chi-tiet.php?id=1`, `/gio-hang.php`, `/lien-he.php` | `index.php`, `chi-tiet.php`, `gio-hang.php`, `lien-he.php`, `inc/db.php`, `src/Data/KhoSanPham.php`, `src/Data/KhoLienHe.php` | Trần Thị Cẩm Thanh |
+| 2 | Tìm kiếm theo từ khóa (`LIKE` + `addcslashes`), lọc danh mục và giá tối đa, sắp xếp theo danh sách cho phép, phân trang (`COUNT(*)` + `LIMIT ? OFFSET ?`), giữ bộ lọc | `/danh-sach.php?q=nhan&dm=1&gia=20000000&sx=gia-tang&trang=1` | `danh-sach.php`, `src/Data/KhoSanPham.php` | Nguyễn Thị Bích Hạnh |
+| 3 | Quản trị sản phẩm ngọc quý: danh sách có phân trang, thêm, sửa, xóa bằng POST (bắt lỗi `1062`, `1451`), tải ảnh đại diện, xem liên hệ đã nhận | `/quan-tri.php`, `/them-san-pham.php`, `/sua-san-pham.php?id=1`, `/xoa-san-pham.php` | `quan-tri.php`, `them-san-pham.php`, `sua-san-pham.php`, `xoa-san-pham.php`, `inc/kiem-tra.php` | Nguyễn Nhật Ánh Hồng |
+| 4 | Đăng ký, đăng nhập, đăng xuất với bảng `nguoi_dung` (`password_hash`/`verify`, bắt lỗi `1062`, `session_regenerate_id`), ghi nhớ đăng nhập, phân quyền `403.php` | `/dang-ky.php`, `/dang-nhap.php`, `/dang-xuat.php` | `dang-ky.php`, `dang-nhap.php`, `dang-xuat.php`, `inc/xac-thuc.php`, `403.php` | Huỳnh Trần Phương Trinh |
+| 5 | Đặt hàng từ giỏ trong giao dịch (`beginTransaction`/`commit`/`rollBack`, `UPDATE ... WHERE ton_kho >= ?`), xem "Đơn hàng của tôi", quản trị đổi trạng thái đơn | `/dat-hang.php`, `/don-hang.php`, `/don-hang.php?id=1` | `dat-hang.php`, `don-hang.php`, `inc/don-hang.php` | Ladisa Bouakeo |
+| 6 | REST API trả JSON và giao diện `fetch`: tìm kiếm tức thời (debounce 300ms) ở `danh-sach.php`, thêm vào giỏ không tải lại trang ở `chi-tiet.php` | `/api/san-pham.php`, `/api/gio-hang.php` | `api/san-pham.php`, `api/gio-hang.php`, `js/tim-kiem.js`, `js/gio-hang.js`, `api.http` | Trần Thị Cẩm Thanh & Nguyễn Thị Bích Hạnh |
+
+## Bảng các Endpoint của REST API
+| Phương thức & URL | Ý nghĩa | Mã trạng thái & Phản hồi JSON |
+|---|---|---|
+| `GET /api/san-pham.php?q=nhan` | Tìm kiếm sản phẩm theo từ khóa (tối đa 8 mục) | `200 OK` `{"du_lieu": [...]}` |
+| `GET /api/san-pham.php?id=1` | Xem thông tin công khai của một sản phẩm | `200 OK` `{"id": 1, ...}` · `400` (id sai kiểu) · `404` `{"loi": "..."}` |
+| `GET /api/gio-hang.php` | Xem giỏ hàng hiện tại trong session | `200 OK` `{"gio": {...}, "so_mon": ...}` |
+| `POST /api/gio-hang.php` | Thêm vào giỏ, thân JSON `{"id": 1, "sl": 2}` | `200 OK` `{"so_mon": ...}` · `400` (JSON hỏng) · `404` (id không có) · `422` (sl âm / vượt tồn kho) · `405` (sai phương thức, kèm header `Allow: GET, POST`) |
 
 ## Kiểm thử
-```bash
-php tests/kiem-thu.php                                   # kiểm thử lớp và hàm, không cần web server
-php -S localhost:8000 router.php &                       # chạy site ở một cửa sổ khác
-bash tests/kiem-thu-http.sh http://localhost:8000        # các ca của Bảng 3 bằng curl, ghi kiemtra/ket-qua-curl.txt
-```
-Ca 12 (MOI_TRUONG = 'prod' + đổi tên tệp JSON) làm tay: xem hướng dẫn trong báo cáo.
-
-## Cấu trúc
-```
-inc/    config.php ham.php header.php footer.php thong-bao.php bao-ve.php tai-khoan.php
-src/    Models/SanPham.php  Data/{KhoSanPham,KhoJsonl,KhoLienHe}.php  Services/{GioHang,DaXem,TaiAnh,BoDem}.php
-data/   san-pham.json (từ Bài tập 4)
-storage/ logs/ uploads/   dữ liệu phát sinh khi chạy (không commit)
-css/ js/ images/ kiemtra/ thanhvien/
-```
+- Mở `api.http` bằng VS Code (extension **REST Client**) để chạy kiểm thử trực tiếp các nhánh thành công và lỗi của REST API.
+- Chạy kiểm thử tự động dòng lệnh:
+  ```bash
+  php tests/kiem-thu.php
+  bash tests/kiem-thu-http.sh http://localhost:8000
+  ```

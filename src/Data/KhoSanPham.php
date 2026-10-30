@@ -1,119 +1,177 @@
 <?php
 /**
- * src/Data/KhoSanPham.php - lớp truy cập dữ liệu: nơi DUY NHẤT đọc data/san-pham.json.
- * Chương 6 chỉ cần viết lại lớp này bằng PDO; các trang gọi tatCa/timTheoId/timKiem không đổi.
- * Cách thử: mở danh-sach.php?q=nhan&dm=phi-thuy&sx=gia-tang; đổi tên tệp JSON để thấy lỗi 500.
+ * src/Data/KhoSanPham.php - lớp truy cập dữ liệu (Repository): mọi câu SQL về san_pham và danh_muc
+ * đều nằm trong lớp này (nhận PDO qua constructor, slide 23 & gợi ý 3 Phụ lục B).
+ * Dùng prepared statement cho mọi dữ liệu người dùng; lấy nhiều id bằng một câu WHERE id IN (...).
+ * Cách thử: mở danh-sach.php?q=nhan&dm=1&gia=20000000&sx=gia-tang&trang=2.
  */
 declare(strict_types=1);
 
 namespace App\Data;
 
 use App\Models\SanPham;
-use JsonException;
-use RuntimeException;
+use PDO;
 
 class KhoSanPham
 {
-    /** Các kiểu sắp xếp được phép (khóa trên URL => nhãn). */
+    /** Các kiểu sắp xếp được phép trên URL (danh sách trắng cho ORDER BY, slide 30). */
     public const SAP_XEP = [
-        'mac-dinh' => 'Mặc định',
+        'moi'      => 'Mới nhất',
         'gia-tang' => 'Giá tăng dần',
         'gia-giam' => 'Giá giảm dần',
         'ten'      => 'Tên A–Z',
     ];
 
-    private ?array $ds = null; // mỗi request chỉ đọc tệp một lần
+    private const SELECT_CO_BAN = 'SELECT sp.*, dm.ten AS ten_danh_muc, dm.slug AS danh_muc_slug
+                                   FROM san_pham sp
+                                   JOIN danh_muc dm ON dm.id = sp.danh_muc_id';
 
-    public function __construct(private string $tepJson)
+    public function __construct(private PDO $db)
     {
     }
 
-    /** @return SanPham[] */
+    /** Tất cả sản phẩm, mới nhất trước. @return SanPham[] */
     public function tatCa(): array
     {
-        if ($this->ds === null) {
-            if (!is_file($this->tepJson)) {
-                throw new RuntimeException('Không có tệp dữ liệu sản phẩm: ' . $this->tepJson);
-            }
-            $json = file_get_contents($this->tepJson);
-            if ($json === false) {
-                throw new RuntimeException('Không đọc được tệp dữ liệu sản phẩm.');
-            }
-            try {
-                $mang = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
-            } catch (JsonException $e) {
-                throw new RuntimeException('Tệp dữ liệu sản phẩm không phải JSON hợp lệ.', 0, $e);
-            }
-            if (!is_array($mang)) {
-                throw new RuntimeException('Tệp dữ liệu sản phẩm phải là một mảng.');
-            }
-            $this->ds = array_map(fn($d) => SanPham::tuMang(is_array($d) ? $d : []), array_values($mang));
-        }
-        return $this->ds;
+        $ds = $this->db->query(self::SELECT_CO_BAN . ' ORDER BY sp.id DESC')->fetchAll();
+        return array_map(fn(array $d): SanPham => SanPham::tuMang($d), $ds);
     }
 
+    /** $soLuong sản phẩm mới nhất cho trang chủ. @return SanPham[] */
+    public function moiNhat(int $soLuong = 4): array
+    {
+        $st = $this->db->prepare(self::SELECT_CO_BAN . ' ORDER BY sp.id DESC LIMIT ?');
+        $st->execute([max(1, $soLuong)]);
+        return array_map(fn(array $d): SanPham => SanPham::tuMang($d), $st->fetchAll());
+    }
+
+    /** Tìm một sản phẩm theo khóa chính id (JOIN kèm tên danh mục). */
     public function timTheoId(int $id): ?SanPham
     {
-        foreach ($this->tatCa() as $sp) {
-            if ($sp->id === $id) {
-                return $sp;
-            }
-        }
-        return null;
+        $st = $this->db->prepare(self::SELECT_CO_BAN . ' WHERE sp.id = ?');
+        $st->execute([$id]);
+        $d = $st->fetch();
+        return $d !== false ? SanPham::tuMang($d) : null;
     }
 
     /**
-     * Tìm theo từ khóa (không phân biệt dấu, hoa/thường), lọc theo danh mục, sắp xếp.
-     * $danhMuc và $sapXep do trang kiểm tra theo danh sách cho phép trước khi gọi.
+     * Lấy nhiều sản phẩm trong MỘT câu SQL bằng WHERE sp.id IN (?, ...) (slide 21 - tránh lỗi N+1).
+     * Trả về mảng kết hợp [id => SanPham].
      *
-     * @return SanPham[]
+     * @param int[] $dsId
+     * @return array<int, SanPham>
      */
-    public function timKiem(string $tuKhoa = '', string $danhMuc = '', string $sapXep = 'mac-dinh'): array
+    public function timTheoNhieuId(array $dsId): array
     {
-        $ds = $this->tatCa();
-        $tk = \boDau(trim($tuKhoa));
-
-        if ($tk !== '') {
-            $ds = array_filter($ds, function (SanPham $sp) use ($tk): bool {
-                $kho = \boDau($sp->ten . ' ' . $sp->ma . ' ' . $sp->loai . ' ' . $sp->xuatXu);
-                return mb_stripos($kho, $tk) !== false;
-            });
+        $ids = array_values(array_unique(array_filter(array_map('intval', $dsId), fn(int $x): bool => $x > 0)));
+        if (!$ids) {
+            return [];
         }
-        if ($danhMuc !== '') {
-            $ds = array_filter($ds, fn(SanPham $sp): bool => $sp->danhMuc === $danhMuc);
-        }
-
-        $ds = array_values($ds);
-        usort($ds, match ($sapXep) {
-            'gia-tang' => fn(SanPham $a, SanPham $b): int => $a->gia <=> $b->gia,
-            'gia-giam' => fn(SanPham $a, SanPham $b): int => $b->gia <=> $a->gia,
-            'ten'      => fn(SanPham $a, SanPham $b): int => strcmp(\boDau($a->ten), \boDau($b->ten)),
-            default    => fn(SanPham $a, SanPham $b): int => $a->id <=> $b->id,
-        });
-        return $ds;
-    }
-
-    /** Các danh mục đang có sản phẩm: khóa => số sản phẩm. */
-    public function danhMucCoSan(): array
-    {
+        $dau = implode(',', array_fill(0, count($ids), '?'));
+        $st = $this->db->prepare(self::SELECT_CO_BAN . " WHERE sp.id IN ($dau)");
+        $st->execute($ids);
         $kq = [];
-        foreach ($this->tatCa() as $sp) {
-            $kq[$sp->danhMuc] = ($kq[$sp->danhMuc] ?? 0) + 1;
+        foreach ($st->fetchAll() as $d) {
+            $sp = SanPham::tuMang($d);
+            $kq[$sp->id] = $sp;
         }
         return $kq;
     }
 
     /**
-     * Sản phẩm liên quan: cùng danh mục trước, thiếu thì lấy thêm sản phẩm khác.
+     * Bốn sản phẩm cùng danh mục với $sp (trừ chính $sp) cho trang chi tiết (Bảng 1, mục 1).
      *
      * @return SanPham[]
      */
-    public function lienQuan(SanPham $sp, int $soLuong = 3): array
+    public function cungDanhMuc(SanPham $sp, int $soLuong = 4): array
     {
-        $khac = array_filter($this->tatCa(), fn(SanPham $x): bool => $x->id !== $sp->id);
-        usort($khac, fn(SanPham $a, SanPham $b): int =>
-            (int) ($b->danhMuc === $sp->danhMuc) <=> (int) ($a->danhMuc === $sp->danhMuc)
-            ?: $a->id <=> $b->id);
-        return array_slice($khac, 0, $soLuong);
+        $st = $this->db->prepare(
+            self::SELECT_CO_BAN
+            . ' WHERE sp.danh_muc_id = ? AND sp.id <> ?
+                ORDER BY sp.id DESC LIMIT ?'
+        );
+        $st->execute([$sp->danhMucId, $sp->id, max(1, $soLuong)]);
+        return array_map(fn(array $d): SanPham => SanPham::tuMang($d), $st->fetchAll());
+    }
+
+    /**
+     * Dựng mệnh đề WHERE và mảng tham số từ bộ lọc $loc (gợi ý 3 Phụ lục B & slide 29).
+     * Dùng chung cho dem() và trang() để hai câu SQL luôn khớp điều kiện.
+     *
+     * @return array{0: string, 1: array<int, mixed>}
+     */
+    private function dieuKien(array $loc): array
+    {
+        $dk = [];
+        $ts = [];
+        $q = trim((string) ($loc['q'] ?? ''));
+        if ($q !== '') {
+            $mau = '%' . addcslashes($q, '%_\\') . '%';
+            $dk[] = '(sp.ten LIKE ? OR sp.ma LIKE ? OR sp.loai LIKE ?)';
+            $ts[] = $mau;
+            $ts[] = $mau;
+            $ts[] = $mau;
+        }
+        if (!empty($loc['dm'])) {
+            $dk[] = 'sp.danh_muc_id = ?';
+            $ts[] = (int) $loc['dm'];
+        }
+        if (!empty($loc['giaToiDa'])) {
+            $dk[] = 'sp.gia <= ?';
+            $ts[] = (int) $loc['giaToiDa'];
+        }
+        $where = $dk ? 'WHERE ' . implode(' AND ', $dk) : '';
+        return [$where, $ts];
+    }
+
+    /** Đếm tổng số dòng khớp bộ lọc để tính số trang (slide 31). */
+    public function dem(array $loc = []): int
+    {
+        [$where, $ts] = $this->dieuKien($loc);
+        $st = $this->db->prepare("SELECT COUNT(*) FROM san_pham sp $where");
+        $st->execute($ts);
+        return (int) $st->fetchColumn();
+    }
+
+    /**
+     * Lấy một trang sản phẩm theo bộ lọc, kiểu sắp xếp và phân trang LIMIT ? OFFSET ? (gợi ý 3).
+     *
+     * @return SanPham[]
+     */
+    public function trang(array $loc, string $sx, int $soDong, int $boQua): array
+    {
+        [$where, $ts] = $this->dieuKien($loc);
+        $orderBy = match ($sx) {
+            'gia-tang' => 'sp.gia ASC, sp.id ASC',
+            'gia-giam' => 'sp.gia DESC, sp.id DESC',
+            'ten'      => 'sp.ten ASC, sp.id ASC',
+            default    => 'sp.id DESC',
+        };
+        $sql = self::SELECT_CO_BAN . " $where ORDER BY $orderBy LIMIT ? OFFSET ?";
+        $st = $this->db->prepare($sql);
+        $st->execute([...$ts, max(1, $soDong), max(0, $boQua)]);
+        return array_map(fn(array $d): SanPham => SanPham::tuMang($d), $st->fetchAll());
+    }
+
+    /**
+     * Tìm kiếm nhanh cho REST API (api/san-pham.php?q=..., tối đa $gioiHan mục, slide 48).
+     *
+     * @return SanPham[]
+     */
+    public function timKiem(string $tuKhoa = '', int $gioiHan = 8): array
+    {
+        return $this->trang(['q' => $tuKhoa], 'moi', $gioiHan, 0);
+    }
+
+    /** Danh sách mọi danh mục kèm số sản phẩm (LEFT JOIN + GROUP BY, slide 12). */
+    public function danhSachDanhMuc(): array
+    {
+        return $this->db->query(
+            'SELECT dm.id, dm.ten, dm.slug, COUNT(sp.id) AS so_sp
+             FROM danh_muc dm
+             LEFT JOIN san_pham sp ON sp.danh_muc_id = dm.id
+             GROUP BY dm.id, dm.ten, dm.slug
+             ORDER BY dm.id ASC'
+        )->fetchAll();
     }
 }

@@ -1,12 +1,13 @@
 <?php
 /**
- * dang-xuat.php - Đăng xuất: gỡ người dùng khỏi session, đổi mã phiên, rồi chuyển về trang chủ.
- * Giữ nguyên giỏ hàng của khách (chỉ xóa thông tin đăng nhập). Sau đó quan-tri.php không vào lại được.
- * Cách thử: đăng nhập, bấm Đăng xuất ở header, rồi mở quan-tri.php -> bị chuyển về dang-nhap.php.
+ * dang-xuat.php - Đăng xuất: xóa mã ghi nhớ đăng nhập, gỡ $_SESSION['uid'], đổi mã phiên,
+ * giữ nguyên giỏ hàng của khách rồi chuyển về trang chủ.
+ * Cách thử: đăng nhập, bấm Đăng xuất ở header, rồi mở quan-tri.php hoặc don-hang.php -> chuyển về dang-nhap.php.
  */
 require __DIR__ . '/inc/config.php';
 
-unset($_SESSION['user']);
+xoaGhiNhoDangNhap();
+unset($_SESSION['uid'], $_SESSION['user']);
 session_regenerate_id(true);
 datFlash('ok', 'Bạn đã đăng xuất.');
 header('Location: index.php');

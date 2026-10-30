@@ -1,7 +1,8 @@
 <?php
 /**
  * src/Services/GioHang.php - giỏ hàng bọc $_SESSION['gio'] = [id => số lượng].
- * Chỉ lưu id và số lượng; GIÁ luôn lấy từ KhoSanPham (không tin dữ liệu từ form).
+ * chiTiet() lấy cả giỏ hàng bằng MỘT câu SQL WHERE id IN (?, ...) qua KhoSanPham::timTheoNhieuId()
+ * để không truy vấn trong vòng lặp (slide 21 & Bảng 1 mục 1); GIÁ luôn lấy từ CSDL.
  * Cách thử: thêm vài sản phẩm ở chi-tiet.php rồi mở gio-hang.php; số món hiện ở header mọi trang.
  */
 declare(strict_types=1);
@@ -23,14 +24,12 @@ class GioHang
         }
     }
 
-    /** id hợp lệ = số nguyên dương; trả về null nếu sai (kể cả khi bị gửi dạng mảng). */
     public static function idHopLe(mixed $giaTri): ?int
     {
         $id = filter_var($giaTri, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
         return $id === false ? null : $id;
     }
 
-    /** Số lượng hợp lệ = số nguyên từ 1 đến SL_TOI_DA; ngược lại null. */
     public static function soLuongHopLe(mixed $giaTri): ?int
     {
         $sl = filter_var($giaTri, FILTER_VALIDATE_INT, [
@@ -48,14 +47,15 @@ class GioHang
         }
         $sach = [];
         foreach ($gio as $id => $sl) {
-            if (is_int($id) && $id > 0 && is_int($sl) && $sl > 0) {
-                $sach[$id] = min($sl, self::SL_TOI_DA);
+            $idInt = filter_var($id, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            $slInt = filter_var($sl, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            if ($idInt !== false && $slInt !== false) {
+                $sach[(int) $idInt] = min((int) $slInt, self::SL_TOI_DA);
             }
         }
         return $sach;
     }
 
-    /** Thêm $sl vào số lượng đang có (tối đa SL_TOI_DA). */
     public function them(int $id, int $sl): void
     {
         $this->kiemTra($id, $sl);
@@ -64,7 +64,6 @@ class GioHang
         $_SESSION[self::KHOA] = $gio;
     }
 
-    /** Đặt số lượng mới cho mục đã có trong giỏ; trả false nếu mục không có. */
     public function capNhat(int $id, int $sl): bool
     {
         $this->kiemTra($id, $sl);
@@ -98,27 +97,30 @@ class GioHang
         return isset($this->tatCa()[$id]);
     }
 
-    /** Số món trong giỏ = tổng số lượng (hiện ở header). */
     public function soMon(): int
     {
         return array_sum($this->tatCa());
     }
 
     /**
-     * Các dòng của giỏ kèm thông tin sản phẩm và thành tiền (giá lấy từ kho dữ liệu).
-     * Mục nào không còn trong dữ liệu thì tự bị gỡ khỏi giỏ.
+     * Lấy chi tiết mọi mục trong giỏ bằng MỘT câu SQL WHERE id IN (?, ...) (slide 21).
      *
      * @return array<int, array{sp: \App\Models\SanPham, sl: int, thanhTien: int}>
      */
     public function chiTiet(KhoSanPham $kho): array
     {
+        $gio = $this->tatCa();
+        if (!$gio) {
+            return [];
+        }
+        $bangSp = $kho->timTheoNhieuId(array_keys($gio));
         $dong = [];
-        foreach ($this->tatCa() as $id => $sl) {
-            $sp = $kho->timTheoId($id);
-            if ($sp === null) {
+        foreach ($gio as $id => $sl) {
+            if (!isset($bangSp[$id])) {
                 $this->xoa($id);
                 continue;
             }
+            $sp = $bangSp[$id];
             $dong[] = ['sp' => $sp, 'sl' => $sl, 'thanhTien' => $sp->gia * $sl];
         }
         return $dong;
