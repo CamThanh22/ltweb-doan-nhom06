@@ -148,9 +148,9 @@ require __DIR__ . '/../../inc/header.php';
                 <figcaption>Ảnh 1: Chân dung sinh viên</figcaption>
             </figure>
             <p><strong>Mã sinh viên:</strong> <?= e(MSSV) ?></p>
-            <p><strong>Email liên hệ:</strong> thanh@ued.vn</p>
+            <p><strong>Email liên hệ:</strong> camthanh0975@gmail.com</p>
             <p><strong>Lớp:</strong> 24CNTT2 — Khoa Toán - Tin, Trường Đại học Sư phạm - ĐHĐN</p>
-            <p><strong>Vai trò trong nhóm:</strong> Nhóm trưởng, phụ trách kiến trúc CSDL, chức năng 1 (đọc dữ liệu MySQL) và quản lý phiên bản Git.</p>
+            <p><strong>Vai trò trong nhóm:</strong> Nhóm trưởng, phụ trách kiến trúc CSDL,  quản lý phiên bản Git.</p>
         </section>
 
         <section id="giao-dien">
@@ -163,10 +163,14 @@ require __DIR__ . '/../../inc/header.php';
         </section>
 
         <section id="tinh-diem">
-            <h2>3. Sổ điểm học phần lưu trong CSDL (bảng <code>tv_diem_hoc_phan</code>)</h2>
+            <h2>3. Sổ điểm học phần lưu trong CSDL </h2>
             <p>
-                Công thức: <code>0,2 × A1 + 0,3 × A2 + 0,5 × A3</code>.
+                Công thức: 0,2 × A1 + 0,3 × A2 + 0,5 × A3.
+            </p>
+            <p>
                 Tổng số tín chỉ: <strong><?= $tongTin ?></strong> ·
+            </p>
+            <p>
                 Điểm trung bình tích lũy (GPA hệ 10): <strong><?= e(number_format($gpa, 2, ',', '.')) ?></strong>.
             </p>
 

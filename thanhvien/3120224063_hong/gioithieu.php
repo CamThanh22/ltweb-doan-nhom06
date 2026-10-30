@@ -144,11 +144,11 @@ require __DIR__ . '/../../inc/header.php';
             <h2>1. Thông tin bản thân</h2>
             <figure>
                 <img alt="Ảnh thẻ chân dung của sinh viên Nguyễn Nhật Ánh Hồng" src="<?= e($anhDaiDien) ?>" width="200">
-                <figcaption>Ảnh 1: Chân dung sinh viên (lưu trong bảng <code>thanh_vien</code>)</figcaption>
+                <figcaption>Ảnh 1: Chân dung sinh viên </figcaption>
             </figure>
             <p><strong>Mã sinh viên:</strong> <?= e(MSSV) ?></p>
             <p><strong>Lớp:</strong> 24CNTT3 — Trường Đại học Sư phạm - Đại học Đà Nẵng</p>
-            <p><strong>Vai trò trong nhóm:</strong> Thành viên, phụ trách Chức năng 3 (CRUD Quản trị sản phẩm và xem liên hệ ở <code>quan-tri.php</code>, <code>them-san-pham.php</code>, <code>sua-san-pham.php</code>, <code>xoa-san-pham.php</code>).</p>
+            <p><strong>Vai trò trong nhóm:</strong> Thành viên, phụ trách Chức năng 3 (CRUD Quản trị sản phẩm và xem liên hệ ở quan-tri.php, them-san-pham.php, sua-san-pham.php, xoa-san-pham.php).</p>
         </section>
 
         <article>
@@ -162,7 +162,7 @@ require __DIR__ . '/../../inc/header.php';
         </article>
 
         <section id="tkb">
-            <h2>3. Thời khóa biểu học tập từ CSDL (bảng <code>tv_thoi_khoa_bieu</code>)</h2>
+            <h2>3. Thời khóa biểu học tập từ CSDL </h2>
             <form method="get" action="gioithieu.php#tkb" class="form-loc-thu">
                 <label for="loc-thu">Thứ:</label>
                 <select id="loc-thu" name="thu">
@@ -250,7 +250,7 @@ require __DIR__ . '/../../inc/header.php';
 
         <section id="avatar">
             <h2>4. Đổi ảnh đại diện lưu vào CSDL</h2>
-            <p>Chọn ảnh JPG, PNG hoặc WebP (tối đa 2 MB). Máy chủ kiểm tra kiểu thật bằng <code>finfo</code>, đặt tên ngẫu nhiên và lưu vào cột <code>anh_dai_dien</code> của bảng <code>thanh_vien</code>.</p>
+            <p>Chọn ảnh JPG, PNG hoặc WebP (tối đa 2 MB). Máy chủ kiểm tra kiểu thật bằng finfo, đặt tên ngẫu nhiên và lưu vào cột anh_dai_dien của bảng thanh_vien.</p>
 <?php if ($loiAnh !== ''): ?>
             <p class="thong-bao loi" role="alert"><?= e($loiAnh) ?></p>
 <?php endif; ?>

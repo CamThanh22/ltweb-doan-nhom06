@@ -87,10 +87,10 @@ require __DIR__ . '/../../inc/header.php';
 <?php require __DIR__ . '/../../inc/thong-bao.php'; ?>
         <h1>Hồ sơ sinh viên: Huỳnh Trần Phương Trinh</h1>
         <section id="gioi-thieu">
-            <h2>1. Giới thiệu bản thân &amp; Kỹ năng (bảng <code>tv_ky_nang</code>)</h2>
+            <h2>1. Giới thiệu bản thân &amp; Kỹ năng </h2>
             <img alt="Ảnh chân dung của Huỳnh Trần Phương Trinh" height="150" src="chan-dung-trinh.jpg" width="150">
             <p><strong>Họ và tên:</strong> Huỳnh Trần Phương Trinh — <strong>MSSV:</strong> <?= e(MSSV) ?></p>
-            <p><strong>Vai trò trong nhóm:</strong> Thành viên, phụ trách Chức năng 4 (Đăng ký, đăng nhập, đăng xuất, phân quyền ở <code>dang-ky.php</code>, <code>dang-nhap.php</code>, <code>inc/xac-thuc.php</code>).</p>
+            <p><strong>Vai trò trong nhóm:</strong> Thành viên, phụ trách Chức năng 4 (Đăng ký, đăng nhập, đăng xuất, phân quyền ở dang-ky.php, dang-nhap.php, inc/xac-thuc.php).</p>
 
             <h3>Danh sách kỹ năng chuyên môn từ CSDL</h3>
             <form method="get" action="gioithieu.php#ky-nang" class="form-loc-thu" id="ky-nang">
@@ -151,7 +151,7 @@ require __DIR__ . '/../../inc/header.php';
         </section>
 
         <section id="viec">
-            <h2>3. Việc cần làm lưu trong CSDL (bảng <code>tv_viec_can_lam</code>)</h2>
+            <h2>3. Việc cần làm lưu trong CSDL </h2>
 <?php if ($loiViec !== ''): ?>
             <p class="thong-bao loi" role="alert"><?= e($loiViec) ?></p>
 <?php endif; ?>

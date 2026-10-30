@@ -122,7 +122,7 @@ require __DIR__ . '/../../inc/header.php';
             </figure>
             <p><strong>Mã sinh viên:</strong> <?= e(MSSV) ?></p>
             <p><strong>Lớp:</strong> Sư phạm Tin học (SPT) — Khoa Toán - Tin, Trường Đại học Sư phạm - ĐHĐN</p>
-            <p><strong>Vai trò trong nhóm:</strong> Thành viên, phụ trách Chức năng 5 (Đặt hàng trong giao dịch <code>dat-hang.php</code>, <code>inc/don-hang.php</code> và xem đơn hàng <code>don-hang.php</code>).</p>
+            <p><strong>Vai trò trong nhóm:</strong> Thành viên, phụ trách Chức năng 5 (Đặt hàng trong giao dịch dat-hang.php, inc/don-hang.php và xem đơn hàng don-hang.php).</p>
         </section>
 
         <article>
@@ -136,7 +136,7 @@ require __DIR__ . '/../../inc/header.php';
         </article>
 
         <section id="danh-gia">
-            <h2>3. Lời chào và Đánh giá hồ sơ lưu trong CSDL (bảng <code>tv_danh_gia</code>)</h2>
+            <h2>3. Lời chào và Đánh giá hồ sơ lưu trong CSDL </h2>
 <?php if ($tenKhach !== ''): ?>
             <p>Chào mừng quay lại, <strong><?= e($tenKhach) ?></strong>!</p>
             <form method="post" action="gioithieu.php#danh-gia">
@@ -157,7 +157,7 @@ require __DIR__ . '/../../inc/header.php';
             <p>Điểm trung bình: <strong><?= $soDg > 0 ? e(number_format($tbDg, 2, ',', '.')) . ' / 5,00' : 'chưa có' ?></strong> (<?= $soDg ?> lượt đánh giá).</p>
             <div class="khung-thoi-khoa-bieu">
                 <table>
-                    <caption>Bảng 1: Tỉ lệ đánh giá theo từng mức sao từ bảng <code>tv_danh_gia</code></caption>
+                    <caption>Bảng 1: Tỉ lệ đánh giá theo từng mức sao từ bảng tv_danh_gia</caption>
                     <thead>
                         <tr>
                             <th scope="col">Mức đánh giá</th>

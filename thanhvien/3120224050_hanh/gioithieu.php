@@ -115,7 +115,7 @@ require __DIR__ . '/../../inc/header.php';
             </figure>
             <p><strong>Mã sinh viên:</strong> <?= e(MSSV) ?></p>
             <p><strong>Lớp:</strong> 24CNTT2 — Khoa Toán - Tin, Trường Đại học Sư phạm - ĐHĐN</p>
-            <p><strong>Vai trò trong nhóm:</strong> Thành viên, phụ trách Chức năng 2 (tìm kiếm, lọc, sắp xếp, phân trang ở <code>danh-sach.php</code>) và kiểm thử 14 ca Bảng 3.</p>
+            <p><strong>Vai trò trong nhóm:</strong> Thành viên, phụ trách Chức năng 2 (tìm kiếm, lọc, sắp xếp, phân trang ở danh-sach.php) và kiểm thử 14 ca Bảng 3.</p>
         </section>
 
         <article>
@@ -129,7 +129,7 @@ require __DIR__ . '/../../inc/header.php';
         </article>
 
         <section id="luot-xem">
-            <h2>3. Thống kê lượt xem theo ngày (bảng <code>tv_luot_xem</code>)</h2>
+            <h2>3. Thống kê lượt xem theo ngày </h2>
             <p>Tổng lượt xem tích lũy: <strong><?= $tongLuotXem ?></strong> lượt (mỗi phiên truy cập tính 1 lần bằng <code>INSERT ... ON DUPLICATE KEY UPDATE</code>).</p>
             <div class="khung-thoi-khoa-bieu">
                 <table>
@@ -153,7 +153,7 @@ require __DIR__ . '/../../inc/header.php';
         </section>
 
         <section id="luu-but">
-            <h2>4. Sổ lưu bút có phân trang (bảng <code>tv_luu_but</code> — <?= $tongLb ?> lời nhắn)</h2>
+            <h2>4. Sổ lưu bút có phân trang </h2>
 <?php if ($loi): ?>
             <p class="thong-bao loi" role="alert">Vui lòng kiểm tra các ô báo lỗi bên dưới.</p>
 <?php endif; ?>

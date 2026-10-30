@@ -1164,3 +1164,23 @@ main img {
     white-space: nowrap;
     border: 0;
 }
+
+th a {
+    color: var(--mau-trang);
+    text-decoration: underline;
+}
+
+tbody th[scope="row"] {
+    background-color: #eef5f2;
+    color: var(--mau-chinh-dam);
+}
+
+tbody th[scope="row"] a {
+    color: var(--mau-chinh-dam);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+tbody th[scope="row"] a:hover {
+    text-decoration: underline;
+}
