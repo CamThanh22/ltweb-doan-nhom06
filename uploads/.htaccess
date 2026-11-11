@@ -1,4 +1,4 @@
-# Ảnh tải lên chỉ để xem: không cho chạy mã PHP trong thư mục này
-<FilesMatch "\.(php|phtml|phar)$">
-    Require all denied
+Options -Indexes
+<FilesMatch "\.(php|phtml|phar|cgi|pl)$">
+Require all denied
 </FilesMatch>
