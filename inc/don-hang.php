@@ -24,8 +24,9 @@ const TRANG_THAI_DON = [
  *
  * @param array<int, int> $gio
  */
-function luuDonHang(array $gio, int $uid, string $ghiChu = ''): int
+function luuDonHang(array $gio, int $uid, string $ghiChu = '', string $phuongThuc = 'cod'): int
 {
+    if (!in_array($phuongThuc, ['cod','chuyen_khoan'], true)) throw new InvalidArgumentException('Phương thức thanh toán không hợp lệ.');
     if (!$gio) {
         throw new InvalidArgumentException('Giỏ hàng đang trống.');
     }
@@ -52,6 +53,8 @@ function luuDonHang(array $gio, int $uid, string $ghiChu = ''): int
             $ct->execute([$maDon, $sl, $id]);
         }
 
+        $db->prepare('INSERT INTO thanh_toan (don_hang_id, phuong_thuc, trang_thai) VALUES (?, ?, ?)')
+           ->execute([$maDon, $phuongThuc, $phuongThuc === 'cod' ? 'chua_thanh_toan' : 'cho_doi_soat']);
         $db->commit();
         return $maDon;
     } catch (Throwable $e) {

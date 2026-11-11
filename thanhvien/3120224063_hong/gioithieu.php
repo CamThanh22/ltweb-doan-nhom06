@@ -202,7 +202,8 @@ require __DIR__ . '/../../inc/header.php';
                             <td><?= e((string) $d['phong']) ?></td>
 <?php if ($laChuTrang): ?>
                             <td>
-                                <form method="post" action="gioithieu.php#tkb" style="display:inline">
+                                <form method="post" action="gioithieu.php#tkb" class="dang-xuat-inline">
+                <?= csrfField() ?>
                                     <input type="hidden" name="hanhdong" value="xoa_tkb">
                                     <input type="hidden" name="id" value="<?= (int) $d['id'] ?>">
                                     <button type="submit">Xóa</button>
@@ -218,6 +219,7 @@ require __DIR__ . '/../../inc/header.php';
 <?php if ($laChuTrang): ?>
             <h3>Thêm ca học mới</h3>
             <form method="post" action="gioithieu.php#tkb" class="form-tham-dinh">
+                <?= csrfField() ?>
                 <input type="hidden" name="hanhdong" value="them_tkb">
                 <p>
                     <label for="tkb-thu">Thứ (*)</label>
@@ -255,6 +257,7 @@ require __DIR__ . '/../../inc/header.php';
             <p class="thong-bao loi" role="alert"><?= e($loiAnh) ?></p>
 <?php endif; ?>
             <form method="post" action="gioithieu.php#avatar" enctype="multipart/form-data">
+                <?= csrfField() ?>
                 <label for="anhdaidien">Ảnh đại diện mới</label>
                 <input id="anhdaidien" name="anhdaidien" type="file" accept="image/jpeg, image/png, image/webp" required>
                 <button type="submit">Tải ảnh lên</button>

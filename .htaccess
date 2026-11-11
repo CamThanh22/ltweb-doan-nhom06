@@ -1,0 +1,10 @@
+Options -Indexes
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule (^|/)\. - [R=404,L]
+RewriteRule ^(pages|inc|src|vendor|database|logs|storage|tests)/ - [R=404,L,NC]
+RewriteRule ^(?:danh\-sach\.php|chi\-tiet\.php|gio\-hang\.php|mua\-ngay\.php|dat\-hang\.php|don\-hang\.php|chung\-thu\.php|dang\-ky\.php|dang\-nhap\.php|dang\-xuat\.php|ho\-so\.php|cong\-dong\.php|tin\-nhan\.php|thong\-bao\-xa\-hoi\.php|chia\-se\-bai\.php|anh\-xa\-hoi\.php|nguoi\-ban\.php|dang\-ban\.php|quan\-tri\.php|kiem\-duyet\.php|them\-san\-pham\.php|sua\-san\-pham\.php|xoa\-san\-pham\.php|gioi\-thieu\.php|lien\-he\.php|403\.php|404\.php|500\.php)$ index.php [END]
+</IfModule>
+<FilesMatch "(?i)^(\.env.*|composer\.(json|lock)|.*\.(sql|log|bak|ini|lock))$">
+Require all denied
+</FilesMatch>
