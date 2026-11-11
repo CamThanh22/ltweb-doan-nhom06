@@ -7,6 +7,14 @@ import { docYeuThich } from './yeu-thich.js';
 
 document.documentElement.classList.add('js');
 
+// Điều hướng responsive được quản lý riêng bởi jadehub-navigation.js.
+
+// Cập nhật số lượng sản phẩm yêu thích từ localStorage.
+
+import { docYeuThich } from './yeu-thich.js';
+
+document.documentElement.classList.add('js');
+
 const nav = document.querySelector('nav');
 
 if (nav) {

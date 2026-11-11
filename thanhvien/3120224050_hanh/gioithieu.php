@@ -158,6 +158,7 @@ require __DIR__ . '/../../inc/header.php';
             <p class="thong-bao loi" role="alert">Vui lòng kiểm tra các ô báo lỗi bên dưới.</p>
 <?php endif; ?>
             <form method="post" action="gioithieu.php#luu-but" class="form-tham-dinh">
+                <?= csrfField() ?>
                 <p>
                     <label for="lb-ten">Tên của bạn (2–50 ký tự) (*)</label>
                     <input id="lb-ten" name="ten" type="text" maxlength="50" required value="<?= e($du['ten']) ?>">
@@ -182,7 +183,8 @@ require __DIR__ . '/../../inc/header.php';
                     <small>(<?= e((string) $lb['thoi_gian']) ?>)</small><br>
                     <?= nl2br(e((string) $lb['loi_nhan'])) ?>
 <?php if ($laChuTrang): ?>
-                    <form method="post" action="gioithieu.php#luu-but" style="display:inline">
+                    <form method="post" action="gioithieu.php#luu-but" class="dang-xuat-inline">
+                <?= csrfField() ?>
                         <input type="hidden" name="xoa" value="<?= (int) $lb['id'] ?>">
                         <button type="submit">Xóa</button>
                     </form>
