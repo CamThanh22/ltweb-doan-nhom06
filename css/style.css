@@ -42,7 +42,7 @@ body {
     margin: 0;
     padding: 0;
 
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: "Times New Roman", Times, serif;
     line-height: 1.6;
 
     color: var(--mau-chu);
@@ -1184,3 +1184,8 @@ tbody th[scope="row"] a {
 tbody th[scope="row"] a:hover {
     text-decoration: underline;
 }
+.dang-xuat-inline{display:inline;margin:0}.dang-xuat-inline button{font:inherit;cursor:pointer;padding:.15rem .45rem}.khu-dat-hang fieldset{margin:1rem 0;padding:1rem;border:1px solid #94a3a1}.khu-dat-hang fieldset label{display:block;margin:.5rem 0}
+
+.da-xong{text-decoration:line-through}
+
+.loi-truong{display:block;color:#a52828;margin:.2rem 0}.loi-truong:empty{display:none}[aria-invalid="true"]{outline:2px solid #a52828}

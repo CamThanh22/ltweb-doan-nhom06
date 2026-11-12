@@ -1,0 +1,413 @@
+JadeHub — kiểm tra kỹ thuật ngày 13/11/2026 (không phải báo cáo môn học)
+Nguồn: Nhom06_JadeHub_XAMPP_CapNhat.zip; giữ nguyên dự án và giao diện.
+Môi trường: PHP 8.4.27, MariaDB 11.8.6, Apache 2.4.69; tài khoản nhom06_app, chỉ SELECT/INSERT/UPDATE/DELETE.
+Chạy độc lập trên CSDL mẫu dùng một lần, không truy cập localhost của người dùng.
+
+co_so_du_lieu	so_cot_xa_hoi	so_bang_xa_hoi
+ltweb_nhom06	6	2
+HTTP/1.1 200 OK
+Host: 127.0.0.1:8000
+Date: Thu, 12 Nov 2026 17:29:43 GMT
+Connection: close
+[Cookie phiên kiểm thử đã ẩn]
+Expires: Thu, 19 Nov 1981 08:52:00 GMT
+Cache-Control: no-store, no-cache, must-revalidate
+Pragma: no-cache
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: DENY
+Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api.open-meteo.com
+Content-type: text/html; charset=UTF-8
+
+PASS PHP >= 8.1
+PASS curl (kiểm thử HTTP)
+PASS PDO
+PASS pdo_mysql
+PASS mbstring
+PASS fileinfo
+PASS Ảnh upload có thể kiểm tra
+PASS Thư mục logs ghi được
+PASS Thư mục uploads ghi được
+Tổng kiểm tra: 9; không đạt: 0
+CẢNH BÁO: .env tồn tại tại máy cục bộ; không đưa vào gói nộp.
+Checked: 51 | Errors: 0
+Extended checks: 28; errors: 0
+PASS kết nối bằng nhom06_app@localhost
+PASS quyền tối thiểu trên cơ sở dữ liệu đang dùng
+PASS đọc bảng sản phẩm
+PASS  e() thoát <, >, " và '
+PASS  vnd(18500000)
+PASS  boDau("Nhẫn Phỉ Thúy Đẹp")
+PASS  SanPham::tuMang thiếu id phải ném ngoại lệ
+PASS  KhoSanPham::dem() có ít nhất 30 sản phẩm
+PASS  timTheoId(1) trả về JADE-01 kèm tên danh mục
+PASS  timTheoId(999999) trả null
+PASS  timTheoNhieuId([1, 2, 999999]) trả đúng 2 mục trong 1 câu SQL
+PASS  tìm kiếm "nhẫn", "NHẪN", "nhan" trả cùng số kết quả
+PASS  tìm kiếm "Levi's" không lỗi SQL và khớp đúng 1 mục
+PASS  tìm kiếm "50%" thoát ký tự đại diện % đúng (chỉ khớp chuỗi 50%)
+PASS  trang() sắp xếp giá tăng dần đúng
+PASS  idHopLe("abc") là null
+PASS  soLuongHopLe: 0, -3, 1000, "x" đều null
+PASS  soMon() = 3 và tongTien() lấy giá từ MySQL
+PASS  DaXem::doc bỏ qua abc, -1, 999999 và giữ thứ tự [3, 5]
+PASS  kiemTraSanPham bắt đủ lỗi tên trống, giá 0, tồn kho -1, danh mục 999
+PASS  KhoLienHe::dem() >= 4
+PASS  TaiAnh::kiemTra(không chọn tệp) = null
+
+Tổng: 19 đạt, 0 hỏng
+PASS 01 headers + cookie
+PASS 02 CSRF malformed/absent
+PASS 02 CSRF malformed/absent
+PASS 02 CSRF malformed/absent
+PASS 03 API CSRF JSON
+PASS 03 API valid CSRF
+PASS 04 GET 405 dang-xuat.php
+PASS 04 GET 405 xoa-san-pham.php
+PASS 05 strict session rejects supplied id
+PASS 06 expired form rejected
+PASS 06 no remembered-login bypass
+PASS Login lan@ued.vn
+PASS Rotate session lan@ued.vn
+PASS Login admin@ued.vn
+PASS Rotate session admin@ued.vn
+PASS Login an@ued.vn
+PASS Rotate session an@ued.vn
+PASS 04 customer admin access
+PASS 04 customer delete denied
+PASS 13 certificate moderation denied
+PASS 08 array danh-sach.php?q%5B%5D=ao
+PASS 08 array chi-tiet.php?id%5B%5D=1
+PASS 08 array danh-sach.php?sx%5B%5D=x
+PASS 08 contact arrays
+PASS 07 reflected XSS escaped
+PASS 11 checkout cod
+PASS 11 persisted price cod
+PASS 14 other buyer cannot view
+PASS 14 buyer cannot confirm payment
+PASS 11 checkout chuyen_khoan
+PASS 11 persisted price chuyen_khoan
+PASS 14 other buyer cannot view
+PASS 14 buyer cannot confirm payment
+PASS 14 cannot confirm without reference
+PASS 14 submitting reference is not payment
+PASS 14 admin confirms verified payment
+PASS 11 inventory decremented exactly twice
+PASS 11 repeat checkout does not duplicate
+PASS 11 rollback out of stock
+PASS 11 cancelling restores inventory
+PASS 11 repeated cancellation cannot inflate stock
+PASS 11 cancelled order cannot reopen
+PASS 11 denied DDL
+PASS 11 denied DDL
+PASS 12 wrong attempt 1
+PASS 12 wrong attempt 2
+PASS 12 wrong attempt 3
+PASS 12 wrong attempt 4
+PASS 12 wrong attempt 5
+PASS 12 correct password blocked on sixth
+PASS Login an@ued.vn
+PASS Rotate session an@ued.vn
+PASS 12 recovers after window
+PASS 13 admin approves real listing
+PASS 13 repeated approval cannot duplicate
+PASS 07 contact stores XSS as plain text
+PASS 07 admin escapes contact name
+PASS upload disguised PHP rejected
+PASS upload real image uses random filename
+PASS chat send persists
+PASS chat GET keeps unread
+PASS chat read receipt CSRF
+PASS chat POST marks read
+PASS B 3120224133_thanh GET
+PASS B 3120224133_thanh missing CSRF
+PASS B 3120224133_thanh non-owner cannot delete
+PASS B 3120224133_thanh arrays
+PASS Login thanh@ued.vn
+PASS Rotate session thanh@ued.vn
+PASS B 3120224133_thanh owner page
+PASS B 3120224133_thanh owner cannot delete foreign row
+PASS B 3120224133_thanh stored XSS escaped
+PASS B 3120224133_thanh POST arrays no 500
+PASS B 3120224050_hanh GET
+PASS B 3120224050_hanh missing CSRF
+PASS B 3120224050_hanh non-owner cannot delete
+PASS B 3120224050_hanh arrays
+PASS Login hanh@ued.vn
+PASS Rotate session hanh@ued.vn
+PASS B 3120224050_hanh owner page
+PASS B 3120224050_hanh owner cannot delete foreign row
+PASS B 3120224050_hanh stored XSS escaped
+PASS B 3120224050_hanh POST arrays no 500
+PASS B 3120224063_hong GET
+PASS B 3120224063_hong missing CSRF
+PASS B 3120224063_hong non-owner cannot delete
+PASS B 3120224063_hong arrays
+PASS Login hong@ued.vn
+PASS Rotate session hong@ued.vn
+PASS B 3120224063_hong owner page
+PASS B 3120224063_hong owner cannot delete foreign row
+PASS B 3120224063_hong stored XSS escaped
+PASS B 3120224063_hong POST arrays no 500
+PASS B 3120124031_trinh GET
+PASS B 3120124031_trinh missing CSRF
+PASS B 3120124031_trinh non-owner cannot delete
+PASS B 3120124031_trinh arrays
+PASS Login trinh@ued.vn
+PASS Rotate session trinh@ued.vn
+PASS B 3120124031_trinh owner page
+PASS B 3120124031_trinh owner cannot delete foreign row
+PASS B 3120124031_trinh stored XSS escaped
+PASS B 3120124031_trinh POST arrays no 500
+PASS B 3120124038_bouakeo GET
+PASS B 3120124038_bouakeo missing CSRF
+PASS B 3120124038_bouakeo non-owner cannot delete
+PASS B 3120124038_bouakeo arrays
+PASS Login bouakeo@ued.vn
+PASS Rotate session bouakeo@ued.vn
+PASS B 3120124038_bouakeo owner page
+PASS B 3120124038_bouakeo owner cannot delete foreign row
+PASS B 3120124038_bouakeo stored XSS escaped
+PASS B 3120124038_bouakeo POST arrays no 500
+PASS B Hong avatar owner protection
+PASS B GET does not increment DB
+PASS B stored XSS escaped
+PASS route index.php
+PASS route danh-sach.php
+PASS route chi-tiet.php
+PASS route gio-hang.php
+PASS route mua-ngay.php
+PASS route dat-hang.php
+PASS route don-hang.php
+PASS route chung-thu.php
+PASS route dang-ky.php
+PASS route dang-nhap.php
+PASS route ho-so.php
+PASS route cong-dong.php
+PASS route tin-nhan.php
+PASS route thong-bao-xa-hoi.php
+PASS route chia-se-bai.php
+PASS route anh-xa-hoi.php
+PASS route nguoi-ban.php
+PASS route dang-ban.php
+PASS route quan-tri.php
+PASS route kiem-duyet.php
+PASS route them-san-pham.php
+PASS route sua-san-pham.php
+PASS route gioi-thieu.php
+PASS route lien-he.php
+PASS logs all 3 security events
+TOTAL 141 PASS / 0 FAIL
+PASS Trang đăng nhập (200)
+PASS Content-Security-Policy:
+PASS X-Content-Type-Options: nosniff
+PASS Referrer-Policy:
+PASS cờ cookie phiên
+PASS Xóa sản phẩm chỉ nhận POST (405)
+PASS Đăng xuất chỉ nhận POST (405)
+PASS Đọc giỏ hàng (200)
+PASS Khách được chuyển tới đăng nhập từ trang quản trị (302)
+PASS API từ chối POST thiếu CSRF (403)
+PASS Tệp SQL nội bộ được bảo vệ (403)
+PASS Tệp cấu hình được bảo vệ (404)
+PASS Phương thức API không hỗ trợ (405)
+PASS JSON không hợp lệ (400)
+PASS Số lượng ngoài giới hạn (422)
+PASS Git nội bộ (404)
+PASS Mã PHP nội bộ (404)
+PASS Composer autoloader nội bộ (404)
+PASS Nguồn trang nội bộ (404)
+PASS Composer manifest (403)
+PASS Log bảo mật (403)
+PASS CSS công khai (200)
+PASS Ảnh công khai (200)
+PASS Không liệt kê uploads (403)
+PASS Uploads không thực thi PHP (403)
+PASS 01 headers + cookie
+PASS 02 CSRF malformed/absent
+PASS 02 CSRF malformed/absent
+PASS 02 CSRF malformed/absent
+PASS 03 API CSRF JSON
+PASS 03 API valid CSRF
+PASS 04 GET 405 dang-xuat.php
+PASS 04 GET 405 xoa-san-pham.php
+PASS 05 strict session rejects supplied id
+PASS 06 expired form rejected
+PASS 06 no remembered-login bypass
+PASS Login lan@ued.vn
+PASS Rotate session lan@ued.vn
+PASS Login admin@ued.vn
+PASS Rotate session admin@ued.vn
+PASS Login an@ued.vn
+PASS Rotate session an@ued.vn
+PASS 04 customer admin access
+PASS 04 customer delete denied
+PASS 13 certificate moderation denied
+PASS 08 array danh-sach.php?q%5B%5D=ao
+PASS 08 array chi-tiet.php?id%5B%5D=1
+PASS 08 array danh-sach.php?sx%5B%5D=x
+PASS 08 contact arrays
+PASS 07 reflected XSS escaped
+PASS 11 checkout cod
+PASS 11 persisted price cod
+PASS 14 other buyer cannot view
+PASS 14 buyer cannot confirm payment
+PASS 11 checkout chuyen_khoan
+PASS 11 persisted price chuyen_khoan
+PASS 14 other buyer cannot view
+PASS 14 buyer cannot confirm payment
+PASS 14 cannot confirm without reference
+PASS 14 submitting reference is not payment
+PASS 14 admin confirms verified payment
+PASS 11 inventory decremented exactly twice
+PASS 11 repeat checkout does not duplicate
+PASS 11 rollback out of stock
+PASS 11 cancelling restores inventory
+PASS 11 repeated cancellation cannot inflate stock
+PASS 11 cancelled order cannot reopen
+PASS 11 denied DDL
+PASS 11 denied DDL
+PASS 12 wrong attempt 1
+PASS 12 wrong attempt 2
+PASS 12 wrong attempt 3
+PASS 12 wrong attempt 4
+PASS 12 wrong attempt 5
+PASS 12 correct password blocked on sixth
+PASS Login an@ued.vn
+PASS Rotate session an@ued.vn
+PASS 12 recovers after window
+PASS 13 admin approves real listing
+PASS 13 repeated approval cannot duplicate
+PASS 07 contact stores XSS as plain text
+PASS 07 admin escapes contact name
+PASS upload disguised PHP rejected
+PASS upload real image uses random filename
+PASS chat send persists
+PASS chat GET keeps unread
+PASS chat read receipt CSRF
+PASS chat POST marks read
+PASS B 3120224133_thanh GET
+PASS B 3120224133_thanh missing CSRF
+PASS B 3120224133_thanh non-owner cannot delete
+PASS B 3120224133_thanh arrays
+PASS Login thanh@ued.vn
+PASS Rotate session thanh@ued.vn
+PASS B 3120224133_thanh owner page
+PASS B 3120224133_thanh owner cannot delete foreign row
+PASS B 3120224133_thanh stored XSS escaped
+PASS B 3120224133_thanh POST arrays no 500
+PASS B 3120224050_hanh GET
+PASS B 3120224050_hanh missing CSRF
+PASS B 3120224050_hanh non-owner cannot delete
+PASS B 3120224050_hanh arrays
+PASS Login hanh@ued.vn
+PASS Rotate session hanh@ued.vn
+PASS B 3120224050_hanh owner page
+PASS B 3120224050_hanh owner cannot delete foreign row
+PASS B 3120224050_hanh stored XSS escaped
+PASS B 3120224050_hanh POST arrays no 500
+PASS B 3120224063_hong GET
+PASS B 3120224063_hong missing CSRF
+PASS B 3120224063_hong non-owner cannot delete
+PASS B 3120224063_hong arrays
+PASS Login hong@ued.vn
+PASS Rotate session hong@ued.vn
+PASS B 3120224063_hong owner page
+PASS B 3120224063_hong owner cannot delete foreign row
+PASS B 3120224063_hong stored XSS escaped
+PASS B 3120224063_hong POST arrays no 500
+PASS B 3120124031_trinh GET
+PASS B 3120124031_trinh missing CSRF
+PASS B 3120124031_trinh non-owner cannot delete
+PASS B 3120124031_trinh arrays
+PASS Login trinh@ued.vn
+PASS Rotate session trinh@ued.vn
+PASS B 3120124031_trinh owner page
+PASS B 3120124031_trinh owner cannot delete foreign row
+PASS B 3120124031_trinh stored XSS escaped
+PASS B 3120124031_trinh POST arrays no 500
+PASS B 3120124038_bouakeo GET
+PASS B 3120124038_bouakeo missing CSRF
+PASS B 3120124038_bouakeo non-owner cannot delete
+PASS B 3120124038_bouakeo arrays
+PASS Login bouakeo@ued.vn
+PASS Rotate session bouakeo@ued.vn
+PASS B 3120124038_bouakeo owner page
+PASS B 3120124038_bouakeo owner cannot delete foreign row
+PASS B 3120124038_bouakeo stored XSS escaped
+PASS B 3120124038_bouakeo POST arrays no 500
+PASS B Hong avatar owner protection
+PASS B GET does not increment DB
+PASS B stored XSS escaped
+PASS route index.php
+PASS route danh-sach.php
+PASS route chi-tiet.php
+PASS route gio-hang.php
+PASS route mua-ngay.php
+PASS route dat-hang.php
+PASS route don-hang.php
+PASS route chung-thu.php
+PASS route dang-ky.php
+PASS route dang-nhap.php
+PASS route ho-so.php
+PASS route cong-dong.php
+PASS route tin-nhan.php
+PASS route thong-bao-xa-hoi.php
+PASS route chia-se-bai.php
+PASS route anh-xa-hoi.php
+PASS route nguoi-ban.php
+PASS route dang-ban.php
+PASS route quan-tri.php
+PASS route kiem-duyet.php
+PASS route them-san-pham.php
+PASS route sua-san-pham.php
+PASS route gioi-thieu.php
+PASS route lien-he.php
+PASS logs all 3 security events
+TOTAL 141 PASS / 0 FAIL
+PASS no PHP warnings/errors during normal and negative HTTP tests
+PASS 09 production database failure index.php
+PASS 09 production database failure api/san-pham.php
+
+Kiểm tra trình duyệt Chromium headless 156:
+co_so_du_lieu	so_cot_xa_hoi	so_bang_xa_hoi
+ltweb_nhom06	6	2
+PASS browser index.php
+PASS browser danh-sach.php
+PASS browser chi-tiet.php?id=1
+PASS browser gio-hang.php
+PASS browser mua-ngay.php?id=1
+PASS browser don-hang.php
+PASS browser ho-so.php
+PASS browser cong-dong.php
+PASS browser tin-nhan.php?id=2
+PASS browser thong-bao-xa-hoi.php
+PASS browser nguoi-ban.php
+PASS browser dang-ban.php
+PASS browser quan-tri.php
+PASS browser kiem-duyet.php
+PASS browser them-san-pham.php
+PASS browser sua-san-pham.php?id=1
+PASS browser gioi-thieu.php
+PASS browser lien-he.php
+PASS browser thanhvien/3120224133_thanh/gioithieu.php
+PASS browser thanhvien/3120224050_hanh/gioithieu.php
+PASS browser thanhvien/3120224063_hong/gioithieu.php
+PASS browser thanhvien/3120124031_trinh/gioithieu.php
+PASS browser thanhvien/3120124038_bouakeo/gioithieu.php
+Cart AJAX with CSRF: true
+Cart counter updated: true
+Mobile menu expanded: true
+Mobile no overflow: true
+HttpOnly: true
+CONSOLE http://127.0.0.1:8080/LTW_BTN6_Nhom06_code/index.php Executing inline script violates the following Content Security Policy directive 'script-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-1UXjZN42osg4IlVHVKkekvxPDi0SqWhqwbWeY/uFwEA='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.
+Inline CSP blocked: true
+Weather uses deterministic fixture; live provider availability not asserted
+BROWSER ERRORS BEFORE INTENTIONAL CSP PROBE []
+
+composer audit: No security vulnerability advisories found.
+Kiểm tra cú pháp: 87 tệp PHP/JavaScript/Bash, 0 lỗi (trước khi thêm script browser).
+Weather trong ca trình duyệt dùng dữ liệu giả định có kiểm soát; không xác nhận dịch vụ ngoài luôn hoạt động.
+Ca lỗi CSDL cố ý tạo PDOException trong log; các ca bình thường và HTTP phủ định trước đó không có lỗi PHP.
+Git tham chiếu đã tải: không theo dõi .env và không thấy lịch sử .env. Chưa tạo tag btn6 hoặc push thay đổi.
+Báo cáo PDF, phần thảo luận và minh chứng đóng góp cá nhân không nằm trong lần bàn giao mã nguồn này.

@@ -27,6 +27,11 @@ $loiTen = '';
 $loiDg  = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (layChuoi($_POST, 'hanhdong') === 'xoa_dg' && !$laChuTrang) {
+        ghiLogBaoMat('cam_truy_cap'); http_response_code(403);
+        require __DIR__.'/../../pages/loi/403.php'; exit;
+    }
+
     $hd = layChuoi($_POST, 'hanhdong');
     if ($hd === 'luuten') {
         $ten = layChuoi($_POST, 'ten');
@@ -140,11 +145,13 @@ require __DIR__ . '/../../inc/header.php';
 <?php if ($tenKhach !== ''): ?>
             <p>Chào mừng quay lại, <strong><?= e($tenKhach) ?></strong>!</p>
             <form method="post" action="gioithieu.php#danh-gia">
+                <?= csrfField() ?>
                 <input type="hidden" name="hanhdong" value="quenten">
                 <button type="submit">Quên tên của tôi</button>
             </form>
 <?php else: ?>
             <form method="post" action="gioithieu.php#danh-gia" class="form-loc-thu">
+                <?= csrfField() ?>
                 <input type="hidden" name="hanhdong" value="luuten">
                 <label for="ten-khach">Tên của bạn (để lần sau chào lại):</label>
                 <input id="ten-khach" name="ten" type="text" maxlength="30" required>
@@ -184,6 +191,7 @@ require __DIR__ . '/../../inc/header.php';
 <?php endif; ?>
             <h3>Gửi đánh giá mới</h3>
             <form method="post" action="gioithieu.php#danh-gia" class="form-tham-dinh">
+                <?= csrfField() ?>
                 <input type="hidden" name="hanhdong" value="danhgia">
                 <p>
                     <label for="dg-ten">Tên của bạn (*)</label>
@@ -212,7 +220,8 @@ require __DIR__ . '/../../inc/header.php';
                     <small>(<?= e((string) $dg['thoi_gian']) ?>)</small>
                     <?= ($dg['nhan_xet'] ?? '') !== '' ? ': ' . e((string) $dg['nhan_xet']) : '' ?>
 <?php if ($laChuTrang): ?>
-                    <form method="post" action="gioithieu.php#danh-gia" style="display:inline">
+                    <form method="post" action="gioithieu.php#danh-gia" class="dang-xuat-inline">
+                <?= csrfField() ?>
                         <input type="hidden" name="hanhdong" value="xoa_dg">
                         <input type="hidden" name="id" value="<?= (int) $dg['id'] ?>">
                         <button type="submit">Xóa</button>
