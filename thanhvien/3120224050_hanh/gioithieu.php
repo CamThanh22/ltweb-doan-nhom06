@@ -18,12 +18,15 @@ $tv = $stTv->fetch() ?: ['ho_ten' => 'Nguyễn Thị Bích Hạnh', 'nguoi_dung_
 $laChuTrang = ((int) (nguoiDung()['id'] ?? 0)) !== 0 && ((int) (nguoiDung()['id'] ?? 0)) === (int) ($tv['nguoi_dung_id'] ?? -1);
 
 // Chức năng CSDL 2: Bộ đếm lượt xem theo ngày (INSERT ... ON DUPLICATE KEY UPDATE, mỗi phiên tăng 1 lần)
-if (empty($_SESSION['da_dem_xem_hanh'])) {
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && layChuoi($_POST, 'hanh_dong') === 'dem_luot_xem') {
+    if (empty($_SESSION['da_dem_xem_hanh'])) {
     db()->prepare(
         'INSERT INTO tv_luot_xem (mssv, ngay, so_luot) VALUES (?, CURDATE(), 1)
          ON DUPLICATE KEY UPDATE so_luot = so_luot + 1'
     )->execute([MSSV]);
     $_SESSION['da_dem_xem_hanh'] = true;
+    }
+    traJson(['ok'=>true]);
 }
 
 $stTongXem = db()->prepare('SELECT COALESCE(SUM(so_luot), 0) FROM tv_luot_xem WHERE mssv = ?');
@@ -42,6 +45,11 @@ $du  = ['ten' => '', 'loi_nhan' => ''];
 $loi = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['xoa']) && !$laChuTrang) {
+        ghiLogBaoMat('cam_truy_cap'); http_response_code(403);
+        require __DIR__.'/../../pages/loi/403.php'; exit;
+    }
+
     $xoa = filter_var($_POST['xoa'] ?? '', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
     if ($xoa !== false) {
         if ($laChuTrang) {
@@ -158,6 +166,7 @@ require __DIR__ . '/../../inc/header.php';
             <p class="thong-bao loi" role="alert">Vui lòng kiểm tra các ô báo lỗi bên dưới.</p>
 <?php endif; ?>
             <form method="post" action="gioithieu.php#luu-but" class="form-tham-dinh">
+                <?= csrfField() ?>
                 <p>
                     <label for="lb-ten">Tên của bạn (2–50 ký tự) (*)</label>
                     <input id="lb-ten" name="ten" type="text" maxlength="50" required value="<?= e($du['ten']) ?>">
@@ -182,7 +191,8 @@ require __DIR__ . '/../../inc/header.php';
                     <small>(<?= e((string) $lb['thoi_gian']) ?>)</small><br>
                     <?= nl2br(e((string) $lb['loi_nhan'])) ?>
 <?php if ($laChuTrang): ?>
-                    <form method="post" action="gioithieu.php#luu-but" style="display:inline">
+                    <form method="post" action="gioithieu.php#luu-but" class="dang-xuat-inline">
+                <?= csrfField() ?>
                         <input type="hidden" name="xoa" value="<?= (int) $lb['id'] ?>">
                         <button type="submit">Xóa</button>
                     </form>

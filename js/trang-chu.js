@@ -27,7 +27,7 @@ async function hienThiThoiTiet() {
         const url =
             `https://api.open-meteo.com/v1/forecast?${params}`;
 
-        const duLieu = await taiJSON(url);
+        const duLieu = await taiJSON(url, {signal: AbortSignal.timeout(8000)});
 
         // Xóa trạng thái đang tải
         box.replaceChildren();
@@ -49,11 +49,6 @@ async function hienThiThoiTiet() {
 
         box.append(tieuDe, thoiTiet, ghiChu);
     } catch (error) {
-        console.error(
-            'Không thể tải dữ liệu thời tiết:',
-            error
-        );
-
         box.replaceChildren();
 
         const thongBao = document.createElement('p');

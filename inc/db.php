@@ -16,9 +16,9 @@ function db(): PDO
             PDO::ATTR_EMULATE_PREPARES   => false,
         ];
         $pdo = new PDO(
-            'mysql:host=localhost;dbname=ltweb_nhom06;charset=utf8mb4',
-            'root',
-            '',
+            'mysql:host=' . $_ENV['DB_HOST'] . ';dbname=' . $_ENV['DB_DATABASE'] . ';charset=utf8mb4',
+            $_ENV['DB_USERNAME'],
+            $_ENV['DB_PASSWORD'],
             $tuyChon
         );
     }
