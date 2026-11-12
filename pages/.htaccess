@@ -1,5 +1,0 @@
-# Root rewrite returns 404 for internal source paths.
-# Fail closed if mod_rewrite is unavailable.
-<IfModule !mod_rewrite.c>
-Require all denied
-</IfModule>

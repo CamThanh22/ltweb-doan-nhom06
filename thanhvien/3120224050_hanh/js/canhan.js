@@ -108,5 +108,3 @@ if (main) {
         );
     });
 }
-// Ghi nhận lượt xem bằng POST có CSRF; GET chỉ đọc dữ liệu.
-fetch('gioithieu.php', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded','X-CSRF-Token':document.querySelector('meta[name="csrf-token"]')?.content || ''}, body:'hanh_dong=dem_luot_xem'}).catch(()=>{});

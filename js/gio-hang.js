@@ -24,7 +24,7 @@ document.addEventListener('submit', async (e) => {
     try {
         const res = await fetch('api/gio-hang.php', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || '' },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 id: Number(du.get('id')),
                 sl: Number(du.get('sl')),

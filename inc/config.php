@@ -1,72 +1,61 @@
 <?php
-/** Cấu hình tập trung JadeHub – Bài 7. */
-declare(strict_types=1);
+/**
+ * inc/config.php - nạp ĐẦU TIÊN ở mọi trang (require __DIR__ . '/inc/config.php').
+ * Việc làm: nạp autoload Composer (App\ -> src/), hàm tiện ích ham.php, kết nối PDO db.php,
+ * xác thực xac-thuc.php, cấu hình lỗi/log theo MOI_TRUONG, mở session và bắt ngoại lệ.
+ * Cách thử: đặt MOI_TRUONG = 'prod', đổi tên CSDL trong inc/db.php rồi mở danh-sach.php -> hiện 500.php.
+ */
+
 $autoloadComposer = __DIR__ . '/../vendor/autoload.php';
-if (!is_file($autoloadComposer)) {
-    http_response_code(500);
-    exit('Chạy composer install trong thư mục JadeHub trước khi mở website.');
+if (is_file($autoloadComposer)) {
+    require_once $autoloadComposer;
+} else {
+    spl_autoload_register(function (string $lop): void {
+        $tienTo = 'App\\';
+        if (strncmp($lop, $tienTo, strlen($tienTo)) !== 0) {
+            return;
+        }
+        $tep = __DIR__ . '/../src/' . str_replace('\\', '/', substr($lop, strlen($tienTo))) . '.php';
+        if (is_file($tep)) {
+            require_once $tep;
+        }
+    });
 }
-require_once $autoloadComposer;
+unset($autoloadComposer);
+
+require_once __DIR__ . '/ham.php';
+require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/xac-thuc.php';
+
+const MOI_TRUONG = 'dev';                  // khi thử ca 14 hoặc lên máy chủ thật: đổi thành 'prod'
+
 error_reporting(E_ALL);
-ini_set('display_errors','0');
-ini_set('log_errors','1');
-ini_set('error_log',__DIR__.'/../logs/php-error.log');
-try {
-    $dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__));
-    $dotenv->safeLoad();
-    $dotenv->required(['DB_HOST', 'DB_DATABASE', 'DB_USERNAME'])->notEmpty();
-    $dotenv->required('DB_PASSWORD');
-    $debug = ($_ENV['APP_DEBUG'] ?? 'false') === 'true';
-    ini_set('display_errors', $debug ? '1' : '0');
-} catch (Throwable $error) {
-    error_log('Không thể nạp cấu hình JadeHub: ' . get_class($error));
-    http_response_code(500);
-    if (str_contains($_SERVER['SCRIPT_NAME'] ?? '', '/api/')) {
-        header('Content-Type: application/json; charset=utf-8');
-        exit(json_encode(['loi'=>'Cấu hình máy chủ chưa đầy đủ'], JSON_UNESCAPED_UNICODE));
-    }
-    exit('Cấu hình JadeHub chưa đầy đủ. Kiểm tra tệp .env theo README.');
-}
+ini_set('display_errors', MOI_TRUONG === 'dev' ? '1' : '0');
+ini_set('log_errors', '1');
+ini_set('error_log', __DIR__ . '/../logs/php-error.log');
+
 date_default_timezone_set('Asia/Ho_Chi_Minh');
-if(function_exists('mb_internal_encoding')) mb_internal_encoding('UTF-8');
-ini_set('session.use_strict_mode','1');
-ini_set('session.use_only_cookies','1');
-ini_set('session.cookie_httponly','1');
-ini_set('session.cookie_samesite','Lax');
-$https=!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS']!=='off';
-if(session_status()!==PHP_SESSION_ACTIVE) {
-    session_set_cookie_params(['lifetime'=>0,'path'=>'/','httponly'=>true,'samesite'=>'Lax','secure'=>$https]);
+mb_internal_encoding('UTF-8');
+
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path'     => '/',
+        'httponly' => true,
+        'samesite' => 'Lax',
+        'secure'   => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+    ]);
     session_start();
 }
-require_once __DIR__.'/ham.php';
-require_once __DIR__.'/db.php';
-require_once __DIR__.'/xac-thuc.php';
-require_once __DIR__.'/csrf.php';
-require_once __DIR__.'/bao-mat.php';
-if (isset($_SESSION['last_activity']) && time()-(int)$_SESSION['last_activity']>1800) {
-    xoaGhiNhoDangNhap();
-    unset($_COOKIE['ghi_nho']);
-    $_SESSION=[];
-    session_regenerate_id(true);
-}
-$_SESSION['last_activity']=time();
-header_remove('X-Powered-By');
-header('X-Content-Type-Options: nosniff');
-header('Referrer-Policy: strict-origin-when-cross-origin');
-header('X-Frame-Options: DENY');
-header("Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api.open-meteo.com");
-if($https) header('Strict-Transport-Security: max-age=31536000');
-if(($_SERVER['REQUEST_METHOD'] ?? 'GET')==='POST' && !csrfHopLe()) {
-    ghiLogBaoMat('csrf_sai');
-    if(str_contains($_SERVER['SCRIPT_NAME'] ?? '', '/api/')) traJson(['loi'=>'CSRF không hợp lệ'],403);
-    http_response_code(403);
-    header('Content-Type: text/plain; charset=utf-8');
-    exit('403: Mã bảo vệ CSRF thiếu hoặc không hợp lệ.');
-}
-set_exception_handler(function(Throwable $e) use ($debug): void {
-    error_log((string)$e);
-    if(!headers_sent()) http_response_code(500);
-    if (str_contains($_SERVER['SCRIPT_NAME'] ?? '', '/api/')) { traJson(['loi'=>'Lỗi máy chủ'], 500); }
-    if($debug) echo '<pre>'.htmlspecialchars((string)$e,ENT_QUOTES,'UTF-8').'</pre>';
-    else require __DIR__.'/../pages/loi/500.php';
+
+set_exception_handler(function (Throwable $loi): void {
+    error_log((string) $loi);
+    if (!headers_sent()) {
+        http_response_code(500);
+    }
+    if (MOI_TRUONG === 'dev') {
+        echo '<pre>' . htmlspecialchars((string) $loi, ENT_QUOTES, 'UTF-8') . '</pre>';
+    } else {
+        require __DIR__ . '/../500.php';
+    }
 });

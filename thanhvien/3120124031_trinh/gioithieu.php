@@ -10,11 +10,6 @@ require __DIR__ . '/../../inc/config.php';
 
 const MSSV = '3120124031';
 $goc = '../../';
-$stChu = db()->prepare('SELECT nguoi_dung_id FROM thanh_vien WHERE mssv = ?');
-$stChu->execute([MSSV]);
-$uidChu = (int)($stChu->fetchColumn() ?: 0);
-$laChuTrang = $uidChu > 0 && (int)(nguoiDung()['id'] ?? 0) === $uidChu;
-
 
 $nhomKyNang = [
     'web'      => 'Lập trình Web',
@@ -41,7 +36,6 @@ $kyNangHienThi = $stKn->fetchAll();
 // Chức năng CSDL 2: Việc cần làm lưu trong bảng tv_viec_can_lam (CRUD + PRG)
 $loiViec = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!$laChuTrang) { ghiLogBaoMat('cam_truy_cap'); http_response_code(403); require __DIR__.'/../../pages/loi/403.php'; exit; }
     $hd     = layChuoi($_POST, 'hanhdong');
     $idViec = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 
@@ -161,31 +155,25 @@ require __DIR__ . '/../../inc/header.php';
 <?php if ($loiViec !== ''): ?>
             <p class="thong-bao loi" role="alert"><?= e($loiViec) ?></p>
 <?php endif; ?>
-<?php if ($laChuTrang): ?>
             <form method="post" action="gioithieu.php#viec" class="form-loc-thu">
-                <?= csrfField() ?>
                 <input type="hidden" name="hanhdong" value="them">
                 <label for="viec-nd">Việc mới (3–150 ký tự):</label>
                 <input id="viec-nd" name="noidung" type="text" maxlength="150" required>
                 <button type="submit">Thêm việc</button>
             </form>
-<?php else: ?><p>Danh sách chỉ đọc; chủ trang mới có quyền chỉnh sửa.</p><?php endif; ?>
 <?php if (!$viec): ?>
             <p>Chưa có việc nào.</p>
 <?php else: ?>
             <ul>
 <?php foreach ($viec as $v): $xong = (bool) $v['da_xong']; ?>
                 <li>
-                    <span class="<?= $xong ? 'da-xong' : '' ?>"><?= e((string) $v['noi_dung']) ?></span>
+                    <span<?= $xong ? ' style="text-decoration: line-through"' : '' ?>><?= e((string) $v['noi_dung']) ?></span>
                     <small>(<?= e((string) $v['ngay_tao']) ?>)</small>
-<?php if ($laChuTrang): ?>
-                    <form method="post" action="gioithieu.php#viec" class="dang-xuat-inline">
-                <?= csrfField() ?>
+                    <form method="post" action="gioithieu.php#viec" style="display:inline">
                         <input type="hidden" name="id" value="<?= (int) $v['id'] ?>">
                         <button type="submit" name="hanhdong" value="xong"><?= $xong ? 'Bỏ đánh dấu' : 'Đã xong' ?></button>
                         <button type="submit" name="hanhdong" value="xoa">Xóa</button>
                     </form>
-<?php endif; ?>
                 </li>
 <?php endforeach; ?>
             </ul>

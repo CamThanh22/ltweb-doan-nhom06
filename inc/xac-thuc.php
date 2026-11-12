@@ -62,9 +62,8 @@ function yeuCauQuyen(string $vaiTro, string $goc = ''): array
 {
     $nd = yeuCauDangNhap($goc);
     if (($nd['vai_tro'] ?? '') !== $vaiTro) {
-        ghiLogBaoMat('cam_truy_cap');
         http_response_code(403);
-        require __DIR__ . '/../pages/loi/403.php';
+        require __DIR__ . '/../403.php';
         exit;
     }
     return $nd;

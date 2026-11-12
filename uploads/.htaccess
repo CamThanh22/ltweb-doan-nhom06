@@ -1,7 +1,4 @@
-Options -Indexes
-<FilesMatch "(?i)\.(php[0-9]*|phtml|phar|cgi|pl|shtml)(\.|$)">
+# Ảnh tải lên chỉ để xem: không cho chạy mã PHP trong thư mục này
+<FilesMatch "\.(php|phtml|phar)$">
     Require all denied
 </FilesMatch>
-<IfModule mod_headers.c>
-    Header always set X-Content-Type-Options "nosniff"
-</IfModule>

@@ -27,11 +27,6 @@ $du = ['ten_mon' => '', 'so_tin' => '3', 'a1' => '', 'a2' => '', 'a3' => ''];
 $loiDiem = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!isset($_POST['giaodien']) && !$laChuTrang) {
-        ghiLogBaoMat('cam_truy_cap'); http_response_code(403);
-        require __DIR__.'/../../pages/loi/403.php'; exit;
-    }
-
     if (isset($_POST['giaodien'])) {
         $moi = layChuoi($_POST, 'giaodien');
         if (in_array($moi, ['sang', 'toi'], true)) {
@@ -125,19 +120,13 @@ $gpa = $tongTin > 0 ? round($tongTichLuy / $tongTin, 2) : 0.0;
 // Chức năng CSDL 2: Thống kê dữ liệu đồ án theo danh mục bằng LEFT JOIN + GROUP BY + SUM
 $thongKeDm = db()->query(
     'SELECT dm.id, dm.ten,
-            COALESCE(kho.so_sp, 0) AS so_sp,
-            COALESCE(kho.tong_ton, 0) AS tong_ton,
-            COALESCE(ban.doanh_thu, 0) AS doanh_thu
+            COUNT(DISTINCT sp.id) AS so_sp,
+            COALESCE(SUM(DISTINCT sp.ton_kho), 0) AS tong_ton,
+            COALESCE(SUM(ctd.so_luong * ctd.don_gia), 0) AS doanh_thu
      FROM danh_muc dm
-     LEFT JOIN (
-       SELECT danh_muc_id, COUNT(*) AS so_sp, SUM(ton_kho) AS tong_ton
-       FROM san_pham GROUP BY danh_muc_id
-     ) kho ON kho.danh_muc_id = dm.id
-     LEFT JOIN (
-       SELECT sp.danh_muc_id, SUM(ctd.so_luong * ctd.don_gia) AS doanh_thu
-       FROM chi_tiet_don ctd JOIN san_pham sp ON sp.id = ctd.san_pham_id
-       GROUP BY sp.danh_muc_id
-     ) ban ON ban.danh_muc_id = dm.id
+     LEFT JOIN san_pham sp ON sp.danh_muc_id = dm.id
+     LEFT JOIN chi_tiet_don ctd ON ctd.san_pham_id = sp.id
+     GROUP BY dm.id, dm.ten
      ORDER BY doanh_thu DESC, so_sp DESC'
 )->fetchAll();
 
@@ -168,7 +157,6 @@ require __DIR__ . '/../../inc/header.php';
             <h2>2. Giao diện sáng / tối (cookie)</h2>
             <p>Đang dùng chế độ: <strong><?= $giaoDien === 'toi' ? 'tối' : 'sáng' ?></strong>.</p>
             <form method="post" action="gioithieu.php">
-                <?= csrfField() ?>
                 <button type="submit" name="giaodien" value="sang">Giao diện sáng</button>
                 <button type="submit" name="giaodien" value="toi">Giao diện tối</button>
             </form>
@@ -218,8 +206,7 @@ require __DIR__ . '/../../inc/header.php';
                             <td><?= e($xepLoai) ?></td>
 <?php if ($laChuTrang): ?>
                             <td>
-                                <form method="post" action="gioithieu.php#tinh-diem" class="dang-xuat-inline">
-                <?= csrfField() ?>
+                                <form method="post" action="gioithieu.php#tinh-diem" style="display:inline">
                                     <input type="hidden" name="xoa_mon" value="<?= (int) $d['id'] ?>">
                                     <button type="submit">Xóa</button>
                                 </form>
@@ -234,7 +221,6 @@ require __DIR__ . '/../../inc/header.php';
 <?php if ($laChuTrang): ?>
             <h3>Thêm học phần mới vào bảng điểm</h3>
             <form method="post" action="gioithieu.php#tinh-diem" class="form-tham-dinh">
-                <?= csrfField() ?>
                 <p>
                     <label for="mon-ten">Tên học phần (*)</label>
                     <input id="mon-ten" name="ten_mon" type="text" maxlength="120" required value="<?= e($du['ten_mon']) ?>">

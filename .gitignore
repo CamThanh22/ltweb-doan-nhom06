@@ -2,7 +2,6 @@
 /vendor/
 /logs/*
 !/logs/.htaccess
-!/logs/.gitkeep
 /storage/*
 !/storage/.htaccess
 /uploads/*
@@ -10,7 +9,3 @@
 !/uploads/.htaccess
 cookie.txt
 *.log
-
-.env
-.env.*
-!.env.example

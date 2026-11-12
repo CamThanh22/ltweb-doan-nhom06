@@ -5,10 +5,6 @@
  * Kiểm tra: e(), vnd(), boDau(), db(), SanPham (JsonSerializable), KhoSanPham (timTheoId,
  * timTheoNhieuId, dem, trang, cungDanhMuc), KhoLienHe, GioHang, DaXem, kiemTraSanPham, TaiAnh.
  */
-if (!extension_loaded('pdo_mysql') || !extension_loaded('mbstring')) {
-    fwrite(STDERR, 'SKIP: Bộ kiểm thử tích hợp cần pdo_mysql và mbstring (bật trong XAMPP/php.ini).'.PHP_EOL);
-    exit(2);
-}
 require __DIR__ . '/../inc/config.php';
 require __DIR__ . '/../inc/kiem-tra.php';
 
